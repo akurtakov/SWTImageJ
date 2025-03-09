@@ -166,7 +166,7 @@ Some dialogs are based on JFace.
 
 #### Layout differences
 
-Instead of the BorderLayout most of the times the SWT [GridLayout](https://www.eclipse.org/articles/Article-Understanding-Layouts/Understanding-Layouts.htm) is used which can be applied very flexible to components. Note that the ImageCanvas is filled inside of a centered parent composite (centered with the GridLayout - the original ImageLayout is not used here). The parent composite can be added to shell (this is default when you start SWTImageJ as a Desktop application) or different composites (embeddable).
+Instead of the BorderLayout most of the times the SWT [GridLayout](https://www.eclipse.org/articles/Article-Understanding-Layouts/Understanding-Layouts.htm) is used which can be applied very flexible to components. Note that the ImageCanvas is filled inside of a centered parent composite (centered with the GridLayout - the original ImageLayout is not used here). The parent composite can be added to a shell (this is default when you start SWTImageJ as a Desktop application) or different composites (embeddable).
 
 #### Mouse Listeners
 
