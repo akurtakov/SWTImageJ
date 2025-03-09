@@ -119,7 +119,12 @@ For efficiency the painting area is restricted to the visible shell or editor ar
 
 In the original ImageJ implementation the AWTEvent is used as an argument with the ij.gui.DialogListener interface method dialogItemChanged. This was ported to a [TypedEvent](https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Freference%2Fapi%2Forg%2Feclipse%2Fswt%2Fevents%2FTypedEvent.html) argument for SWT.
 
-### List of some typical SWT replacements
+### List of some typical changes for SWT
+
+#### Layout differences
+
+Instead of the BorderLayout most of the times the SWT [GridLayout](https://www.eclipse.org/articles/Article-Understanding-Layouts/Understanding-Layouts.htm) is used which can be applied very flexible to components. Note that the ImageCanvas is filled inside of a centered parent composite (centered with the GridLayout - the original ImageLayout is not used here). The parent composite can be added to a shell (this is default when you start SWTImageJ as a Desktop application) or different composites (embeddable).
+
 
 #### Listeners:
 
@@ -163,10 +168,6 @@ addRadioButtonGroup -> Group with Button(SWT.RADIO)
 The HTML dialog uses the SWT Browser.
 
 Some dialogs are based on JFace.
-
-#### Layout differences
-
-Instead of the BorderLayout most of the times the SWT [GridLayout](https://www.eclipse.org/articles/Article-Understanding-Layouts/Understanding-Layouts.htm) is used which can be applied very flexible to components. Note that the ImageCanvas is filled inside of a centered parent composite (centered with the GridLayout - the original ImageLayout is not used here). The parent composite can be added to a shell (this is default when you start SWTImageJ as a Desktop application) or different composites (embeddable).
 
 #### Mouse Listeners
 
