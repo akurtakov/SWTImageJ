@@ -36,7 +36,7 @@ User Guide: [https://imagej.net/ij/docs/guide/](https://imagej.net/ij/docs/guide
 
 Book: [https://imagingbook.com/](https://imagingbook.com/)
 
-### ImageJ Forum
+### ImageJ Forum & Mailing List
 
 Mailing List: [https://list.nih.gov/cgi-bin/wa.exe?A0=IMAGEJ](https://list.nih.gov/cgi-bin/wa.exe?A0=IMAGEJ)
 
