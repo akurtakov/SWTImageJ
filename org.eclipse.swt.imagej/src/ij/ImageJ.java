@@ -207,22 +207,6 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 	private org.eclipse.swt.graphics.Image img;
 	private Composite composite;
 
-	/* The composite which embeds the toolbar (and status bar, etc.)! */
-	public Composite getComposite() {
-
-		return composite;
-	}
-
-	public org.eclipse.swt.graphics.Image getIconImage() {
-
-		return img;
-	}
-
-	public Shell getShell() {
-
-		return shell;
-	}
-
 	/* Compatibility methods since we have no Frame here! */
 	public Rectangle getBounds() {
 
@@ -1463,5 +1447,21 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 	public void shellIconified(ShellEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/* The composite which embeds the toolbar (and status bar, etc.)! */
+	public Composite getComposite() {
+
+		return composite;
+	}
+
+	public org.eclipse.swt.graphics.Image getIconImage() {
+
+		return img;
+	}
+
+	public Shell getShell() {
+
+		return shell;
 	}
 }
