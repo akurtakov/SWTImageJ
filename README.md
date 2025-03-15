@@ -97,7 +97,7 @@ Copy the compiled plugin classes to the plugins folder of SWTImageJ thus it can 
 In general the SWTImageJ implementation follows the general ImageJ layout of packages, classes and folders familiar to ImageJ developers. 
 
 For some parts (selection API) the SWTGraphics2D library is used to convert Java2D calls to SWT graphic calls, see:
-See: https://github.com/jfree/swtgraphics2d
+See: [https://github.com/jfree/swtgraphics2d](https://github.com/jfree/swtgraphics2d)
 
 For a fast image display the processor classes of ImageJ have been translated to SWT. For this I tried out several known described implementations but found myself a more effective method with a direct pixel transfer similar to the creation of a BufferedImage (see the different processor classes).
 
