@@ -109,13 +109,7 @@ public class RoiProperties implements ModifyListener, ShellListener {
 			justification = troi.getJustification();
 			antialias = troi.getAntiAlias();
 		}
-		String position = "" + roi.getPosition();
-		if(roi.hasHyperStackPosition())
-			position = roi.getCPosition() + "," + roi.getZPosition() + "," + roi.getTPosition();
-		if(position.equals("0"))
-			position = "none";
-		else if(position.equals("" + PointRoi.POINTWISE_POSITION))
-			position = "point-specific";
+		String position = roi.getPositionAsString();
 		String group = "" + roi.getGroup();
 		if(group.equals("0"))
 			group = "none";
