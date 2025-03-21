@@ -127,7 +127,7 @@ Instead of the BorderLayout most of the times the SWT [GridLayout](https://www.e
 
 #### Listeners:
 
-AWTEvent -> TypedEvent (used in ij.gui.DialogListener)
+AWTEvent -> [TypedEvent](https://archive.eclipse.org/eclipse/downloads/documentation/2.0/html/plugins/org.eclipse.platform.doc.isv/reference/api/org/eclipse/swt/events/TypedEvent.html) (used in ij.gui.DialogListener)
 
 actionPerformed -> widgetSelected
 
