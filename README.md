@@ -108,7 +108,7 @@ The reasons are noted in the API description (see API description 1, 2) and on S
 , [Link API description 2](https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Freference%2Fapi%2Forg%2Feclipse%2Fswt%2Fwidgets%2FWidget.html&anchor=checkSubclass())
 , [Stack Overflow](https://stackoverflow.com/questions/4264983/why-is-subclassing-not-allowed-for-many-of-the-swt-controls)
 
-To identify them in the WindowManager (responsible to address open images, etc.) an interface has been created [WindowSwt](https://github.com/eclipse-swtimagej/SWTImageJ/blob/develop/org.eclipse.swt.imagej/src/ij/plugin/frame/swt/WindowSwt.java) implemented by dialogs, etc., 
+To identify them in the [WindowManager](https://wsr.imagej.net/api/ij/ij/WindowManager.html) (responsible to address open images, etc.) an interface has been created [WindowSwt](https://github.com/eclipse-swtimagej/SWTImageJ/blob/develop/org.eclipse.swt.imagej/src/ij/plugin/frame/swt/WindowSwt.java) implemented by dialogs, etc., 
 which were former Frame and Dialog instances. Some typical Frame events have been integrated in the interface as default methods.
 
 The main image display will not resize the shell when zooming in or out occurs (embedded concept). When the visible zoomed display of the image
