@@ -1537,6 +1537,10 @@ public class GenericDialog implements WindowSwt, org.eclipse.swt.events.ModifyLi
 
 	private void recordCheckboxOption(Button cb) {
 
+		if (labels == null)
+
+			return;
+
 		String label = (String) labels.get((Object) cb);
 		if (label != null) {
 			AtomicReference<Boolean> selection = new AtomicReference<Boolean>();

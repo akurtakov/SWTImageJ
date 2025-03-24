@@ -65,10 +65,7 @@ public class Duplicator implements PlugIn, SelectionListener, VerifyListener {
 		Roi roiA = imp.getRoi();
 		ImagePlus impA = imp;
 		boolean isRotatedRect = (roiA != null && roiA instanceof RotatedRectRoi);
-		if (isRotatedRect) {
-			Rectangle bounds = imp.getRoi().getBounds();
-			imp.setRoi(bounds);
-		}
+
 		boolean roiOutside = false;
 		if (roiA != null) {
 			Rectangle r = roiA.getBounds();
@@ -87,12 +84,19 @@ public class Duplicator implements PlugIn, SelectionListener, VerifyListener {
 			if (imp.isHyperStack() || imp.isComposite()) {
 				if (roiOutside)
 					imp.deleteRoi();
-				duplicateHyperstack(imp, newTitle);
-				if (isRotatedRect)
+				boolean ok = duplicateHyperstack(imp, newTitle);
+				if (ok && isRotatedRect)
 					straightenRotatedRect(impA, roiA, IJ.getImage());
 				return;
 			} else
 				newTitle = showDialog(imp, "Duplicate...", "Title: ");
+		}
+		if (isRotatedRect) {
+
+			Rectangle bounds = imp.getRoi().getBounds();
+
+			imp.setRoi(bounds);
+
 		}
 		if (newTitle == null) {
 			if (isRotatedRect)
@@ -595,11 +599,11 @@ public class Duplicator implements PlugIn, SelectionListener, VerifyListener {
 		return title;
 	}
 
-	void duplicateHyperstack(ImagePlus imp, String newTitle) {
+	boolean duplicateHyperstack(ImagePlus imp, String newTitle) {
 
 		newTitle = showHSDialog(imp, newTitle);
 		if (newTitle == null)
-			return;
+			return false;
 		ImagePlus imp2 = null;
 		Roi roi = imp.getRoi();
 		if (!duplicateStack) {
@@ -616,11 +620,11 @@ public class Duplicator implements PlugIn, SelectionListener, VerifyListener {
 		}
 		imp2 = run(imp, firstC, lastC, firstZ, lastZ, firstT, lastT);
 		if (imp2 == null)
-			return;
+			return false;
 		imp2.setTitle(newTitle);
 		if (imp2.getWidth() == 0 || imp2.getHeight() == 0) {
 			IJ.error("Duplicator", "Selection is outside the image");
-			return;
+			return false;
 		}
 		if (roi != null && roi.isArea() && roi.getType() != Roi.RECTANGLE) {
 			Roi roi2 = (Roi) cropRoi(imp, roi).clone();
@@ -631,6 +635,7 @@ public class Duplicator implements PlugIn, SelectionListener, VerifyListener {
 		imp2.setPosition(imp.getC(), imp.getZ(), imp.getT());
 		if (IJ.isMacro() && imp2.getWindow() != null)
 			IJ.wait(50);
+		return true;
 	}
 
 	String showHSDialog(ImagePlus imp, String newTitle) {

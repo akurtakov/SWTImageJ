@@ -387,8 +387,8 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		}
 		gd.addStringField("Circularity:", IJ.d2s(minCircularity) + "-" + IJ.d2s(maxCircularity), 12);
 		gd.addChoice("Show:", showStrings2, showStrings[showChoice]);
-		String[] labels = new String[10];
-		boolean[] states = new boolean[10];
+		String[] labels = new String[8];
+		boolean[] states = new boolean[8];
 		labels[0] = "Display results";
 		states[0] = (options & SHOW_RESULTS) != 0;
 		labels[1] = "Exclude on edges";
@@ -405,9 +405,7 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		states[6] = (options & ADD_TO_MANAGER) != 0;
 		labels[7] = "Composite ROIs";
 		states[7] = (options & COMPOSITE_ROIS) != 0;
-		labels[8] = "Record starts";
-		states[8] = (options & RECORD_STARTS) != 0;
-		gd.addCheckboxGroup(5, 2, labels, states);
+		gd.addCheckboxGroup(4, 2, labels, states);
 		gd.addHelp(IJ.URL2 + "/docs/menus/analyze.html#ap");
 		gd.showDialog();
 		if (gd.wasCanceled())
@@ -490,11 +488,6 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 			options |= COMPOSITE_ROIS;
 		else
 			options &= ~COMPOSITE_ROIS;
-
-		if (gd.getNextBoolean())
-			options |= RECORD_STARTS;
-		else
-			options &= ~RECORD_STARTS;
 
 		staticOptions = options;
 		options |= SHOW_PROGRESS;
