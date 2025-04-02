@@ -281,10 +281,11 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		}
 		display = getDisplay();
 		if (SWT_MODE == EMBEDDED) {
-			shell = new Shell(display, SWT.ON_TOP | SWT.SHELL_TRIM | SWT.TOOL);
+			shell = new Shell(display);
+			//shell = new Shell(display, SWT.ON_TOP | SWT.SHELL_TRIM | SWT.TOOL);
 		} else {
 			if (Prefs.alwaysOnTop) {
-				shell = new Shell(display, SWT.ON_TOP | SWT.SHELL_TRIM | SWT.TOOL);
+				shell = new Shell(display, SWT.ON_TOP);
 			} else {
 				shell = new Shell(display);
 			}
