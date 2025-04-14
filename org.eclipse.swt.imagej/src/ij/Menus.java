@@ -1015,7 +1015,13 @@ public class Menus {
 
 	private static org.eclipse.swt.widgets.Menu getMenu(String menuPath) {
 
-		return getMenu(menuPath, false);
+		if (GraphicsEnvironment.isHeadless())
+
+			return null;
+
+		else
+
+			return getMenu(menuPath, false);
 	}
 
 	private static org.eclipse.swt.widgets.Menu getMenu(String menuName, boolean readFromProps) {

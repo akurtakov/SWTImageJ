@@ -35,6 +35,8 @@ import ij.process.ImageProcessor;
 		text[6] = "ImageJ is in the public domain";
 		ImageProcessor ip = null;
 		ImageJ ij = IJ.getInstance();
+		if (ij==null)
+			return;
 		//URL url = ij .getClass() .getResource("/about.jpg");
 		File fi=new File(ImageJ.getImageJPath(ImageJ.SWT_MODE)+"/about.jpg");
 		org.eclipse.swt.graphics.Image img = null;

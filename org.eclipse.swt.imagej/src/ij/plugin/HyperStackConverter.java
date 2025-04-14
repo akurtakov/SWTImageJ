@@ -1,8 +1,15 @@
 package ij.plugin;
 
+import java.awt.GraphicsEnvironment;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Listener;
 
 import ij.CompositeImage;
 import ij.IJ;
@@ -10,9 +17,11 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.VirtualStack;
 import ij.WindowManager;
+import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
 import ij.gui.StackWindow;
 import ij.macro.Interpreter;
+import ij.measure.Calibration;
 import ij.plugin.frame.Recorder;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
@@ -27,6 +36,9 @@ public class HyperStackConverter implements PlugIn {
 	static final String[] orders = { "xyczt(default)", "xyctz", "xyzct", "xyztc", "xytcz", "xytzc" };
 	static int ordering = CZT;
 	static boolean splitRGB = true;
+	static final String[] DIMENSION_LABELS = { "Channels (c):", "Slices (z):", "Frames (t):" };
+	static final int MAX_DIMENSIONS = DIMENSION_LABELS.length;
+	static int lastAutoCbxIndex = -1; // remembers which dimension to auto-calculate in Stack to hyperstack
 
 	public void run(String arg) {
 		if (arg.equals("new")) {
@@ -209,40 +221,145 @@ public class HyperStackConverter implements PlugIn {
 	 * Stack_to_Image5D class in Joachim Walter's Image5D plugin.
 	 */
 	void convertStackToHS(ImagePlus imp) {
-		int nChannels = imp.getNChannels();
-		int nSlices = imp.getNSlices();
-		int nFrames = imp.getNFrames();
-		int stackSize = imp.getImageStackSize();
+		final int stackSize = imp.getImageStackSize();
+		final boolean rgb = imp.getBitDepth() == 24;
+		final int[] dimensions = { imp.getNChannels(), imp.getNSlices(), imp.getNFrames() };
 		if (stackSize == 1) {
 			IJ.error("Stack to HyperStack", "Stack required");
 			return;
 		}
-		boolean rgb = imp.getBitDepth() == 24;
-		String[] modes = { "Composite", "Color", "Grayscale" };
-		GenericDialog gd = new GenericDialog("Convert to HyperStack");
+		final String[] modes = { "Composite", "Color", "Grayscale" };
+		final org.eclipse.swt.widgets.Button[] autoCbxs = new org.eclipse.swt.widgets.Button[MAX_DIMENSIONS]; // checkboxes
+																												// for
+																												// auto
+																												// calculation
+		final GenericDialog gd = new GenericDialog("Convert to HyperStack");
 		gd.addChoice("Order:", orders, orders[ordering]);
-		gd.addNumericField("Channels (c):", nChannels, 0);
-		gd.addNumericField("Slices (z):", nSlices, 0);
-		gd.addNumericField("Frames (t):", nFrames, 0);
-		gd.addChoice("Display Mode:", modes, modes[1]);
+		for (int i = 0; i < MAX_DIMENSIONS; i++) { // Channels C, Slices Z, Times T
+			gd.addNumericField(DIMENSION_LABELS[i], dimensions[i], 0);
+			if (rgb && i == C)
+				gd.getLabel().setVisible(false); // channels input not allowed for RGB (thus make label invisible)
+			if (!GraphicsEnvironment.isHeadless()) { // add 'auto' checkbox
+				org.eclipse.swt.widgets.Composite panel = new Composite(gd.getShell(), SWT.NONE);
+				org.eclipse.swt.widgets.Button cb = new org.eclipse.swt.widgets.Button(panel, SWT.CHECK);
+				cb.setText("auto");
+				cb.setSelection(i == lastAutoCbxIndex);
+				autoCbxs[i] = cb;
+				// panel.add(cb);
+				gd.addToSameRow();
+				gd.addPanel(panel);
+			}
+		}
+		gd.addChoice("Display Mode:", modes, modes[2]);
 		if (rgb) {
 			gd.setInsets(15, 0, 0);
 			gd.addCheckbox("Convert RGB to 3 Channel Hyperstack", splitRGB);
+			autoCbxs[C].setVisible(false); // channels input not allowed for RGB (TextField & checkbox invisible)
+			autoCbxs[C].setSelection(false);
+			((org.eclipse.swt.widgets.Text) (gd.getNumericFields().elementAt(C))).setVisible(false);
 		}
+
+		if (!GraphicsEnvironment.isHeadless()) {
+			final DialogListener dialogListener = new DialogListener() { // checks the validity of the input and
+																			// calculates 'auto' dimension
+				public boolean dialogItemChanged(GenericDialog gd, TypedEvent e) {
+					gd.resetCounters();
+					int autoCbxIndex = -1;
+					for (int i = 0; i < MAX_DIMENSIONS; i++) { // determine currently active #auto checkbox
+						if (autoCbxs[i].getSelection()) {
+							autoCbxIndex = i;
+							break;
+						}
+					}
+
+					int numFieldIndex = e == null ? // numeric field triggering the callback or -1
+							-1 : gd.getNumericFields().indexOf(e.getSource());
+					// IJ.log("autoCbx="+autoCbxIndex+" numSrc="+numFieldIndex+" e="+e);
+					if (numFieldIndex >= 0 && numFieldIndex == autoCbxIndex) {
+						autoCbxs[autoCbxIndex].setSelection(false); // if manual input into 'auto' field: disable 'auto'
+						autoCbxIndex = -1;
+					}
+					double sizeProduct = 1;
+					for (int i = 0; i < MAX_DIMENSIONS; i++) {
+						double num = gd.getNextNumber();
+						if (i == autoCbxIndex)
+							continue;
+						if (!(num > 0 && num == (int) num)) {
+							IJ.showStatus(DIMENSION_LABELS[i] + " Invalid");
+							return false;
+						}
+						sizeProduct *= num;
+					}
+					if (autoCbxIndex >= 0) { // calculate the 'auto' dimension
+						double autoValue = stackSize / sizeProduct;
+						boolean autoOk = (autoValue == (int) autoValue);
+						String autoFieldText = autoOk ? Integer.toString((int) autoValue) : "invalid";
+						final org.eclipse.swt.widgets.Text autoField = (org.eclipse.swt.widgets.Text) (gd
+								.getNumericFields().elementAt(autoCbxIndex)); // input field with auto-calculated
+																				// dimension
+						final Listener[] listeners = autoField.getListeners(SWT.CHANGED);
+						for (Listener l : listeners) // disable callback when we set the field text
+							autoField.removeListener(SWT.CHANGED, l);
+						autoField.setText(autoFieldText);
+						Display.getDefault().syncExec(() -> { // re-enable listeners later, after the change is really done (otherwise race condition)
+							for (Listener l : listeners)
+								autoField.addListener(SWT.CHANGED, l);
+						});
+						if (!autoOk) {
+							IJ.showStatus(DIMENSION_LABELS[autoCbxIndex] + " No integer result");
+							return false;
+						}
+					} else if (sizeProduct != stackSize) {
+						IJ.showStatus("channels * slices * frames = " + (int) sizeProduct + " differs from stack size ("
+								+ stackSize + ")");
+						return false;
+					}
+					lastAutoCbxIndex = autoCbxIndex;
+					IJ.showStatus("");
+					return true;
+				}
+			}; // end of new DialogListener
+			gd.addDialogListener(dialogListener);
+
+			for (final org.eclipse.swt.widgets.Button cb : autoCbxs) { // listener: enabling an 'auto' checkbox should
+																		// trigger calculation
+
+				cb.addSelectionListener(new SelectionListener() {
+					public void widgetSelected(SelectionEvent event) {
+						if (cb.getSelection()) {
+							for (org.eclipse.swt.widgets.Button cb2 : autoCbxs)
+								if (cb2 != event.getSource())
+									cb2.setSelection(false); // radio-button like, never more than one checkbox on
+							gd.getButtons()[0].setEnabled(dialogListener.dialogItemChanged(gd, event)); // auto
+																										// calculation;
+																										// enable ok
+																										// button if
+																										// success
+						}
+					}
+
+					public void widgetDefaultSelected(SelectionEvent event) {
+					}
+				});
+
+			}
+			dialogListener.dialogItemChanged(gd, null); // enables/diables fields
+		}
+
 		gd.showDialog();
 		if (gd.wasCanceled())
 			return;
 		ordering = gd.getNextChoiceIndex();
-		nChannels = (int) gd.getNextNumber();
-		nSlices = (int) gd.getNextNumber();
-		nFrames = (int) gd.getNextNumber();
+		int nChannels = (int) gd.getNextNumber();
+		int nSlices = (int) gd.getNextNumber();
+		int nFrames = (int) gd.getNextNumber();
 		int mode = gd.getNextChoiceIndex();
 		if (rgb)
 			splitRGB = gd.getNextBoolean();
-		if (rgb && splitRGB == true) {
-			new CompositeConverter().run(mode == 0 ? "composite" : "color");
-			return;
-		}
+		/*
+		 * if (rgb && splitRGB==true) { new
+		 * CompositeConverter().run(mode==0?"composite":"color"); return; }
+		 */
 		if (rgb && nChannels > 1) {
 			IJ.error("HyperStack Converter", "RGB stacks are limited to one channel");
 			return;
@@ -288,6 +405,11 @@ public class HyperStackConverter implements PlugIn {
 			imp.hide();
 			WindowManager.setCurrentWindow(imp2.getWindow());
 		}
+		if (rgb && splitRGB == true) {
+			new CompositeConverter().run(mode == 0 ? "composite" : "color");
+			return;
+		}
+
 		if (IJ.recording() && Recorder.scriptMode()) {
 			String order = orders[ordering];
 			if (order.equals(orders[0])) { // default order
@@ -398,6 +520,11 @@ public class HyperStackConverter implements PlugIn {
 		}
 		if (imp != imp2) {
 			imp2.setOverlay(imp.getOverlay());
+			Calibration cal = imp2.getCalibration();
+			if (cal.frameInterval > 0)
+				imp2.setDimensions(1, 1, imp2.getStackSize());
+			else
+				imp2.setDimensions(1, imp2.getStackSize(), 1);
 			imp.hide();
 		}
 		if (IJ.recording() && Recorder.scriptMode())

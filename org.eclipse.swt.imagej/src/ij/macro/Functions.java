@@ -5434,7 +5434,7 @@ public class Functions implements MacroConstants, Measurements {
 		String path = getFirstString();
 		boolean specifiedMax = false;
 		if (interp.nextToken() == ',') {
-			max = (long)getNextArg();
+			max = (long) getNextArg();
 			specifiedMax = true;
 		}
 		interp.getRightParen();
@@ -5457,7 +5457,7 @@ public class Functions implements MacroConstants, Measurements {
 				max = len;
 			InputStream in = new BufferedInputStream(new FileInputStream(path));
 			DataInputStream dis = new DataInputStream(in);
-			byte[] buffer = new byte[(int)max];
+			byte[] buffer = new byte[(int) max];
 			dis.readFully(buffer);
 			dis.close();
 			char[] buffer2 = new char[buffer.length];
@@ -7128,9 +7128,28 @@ public class Functions implements MacroConstants, Measurements {
 			return deleteArrayIndex();
 		else if (name.equals("filter"))
 			return filterArray();
+		else if (name.equals("applyMacro"))
+			return applyMacroToArray();
 		else
 			interp.error("Unrecognized Array function");
 		return null;
+	}
+
+	Variable[] applyMacroToArray() {
+		interp.getLeftParen();
+		Variable[] a = getArray();
+		String macro = (String) getNextString();
+		interp.getRightParen();
+		ResultsTable rt = new ResultsTable();
+		rt.setColumn("v", a);
+		rt.applyMacro(macro);
+		Variable column = null;
+		try {
+			column = new Variable(rt.getColumnAsVariables("v"));
+		} catch (Exception e) {
+			interp.error(e.getMessage());
+		}
+		return column.getArray();
 	}
 
 	Variable[] filterArray() {
