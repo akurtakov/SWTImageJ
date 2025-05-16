@@ -13,8 +13,10 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import ij.IJ;
@@ -56,6 +58,7 @@ public class Recorder extends PlugInFrame implements PlugIn, WindowSwt, Selectio
 	private static Vector<Thread> notRecordingThreads = new Vector<Thread>();
 	private String fitTypeStr = CurveFitter.fitList[0];
 	protected Font font;
+	private Composite composite;
 	private static org.eclipse.swt.widgets.Text textArea;
 	private static Recorder instance;
 	private static String commandName;
@@ -88,13 +91,15 @@ public class Recorder extends PlugInFrame implements PlugIn, WindowSwt, Selectio
 		Display.getDefault().syncExec(() -> {
 
 			WindowManager.addWindow(Recorder.this);
-			getShell().setLayout(new GridLayout(8, false));
+			getShell().setLayout(new FillLayout());
+			composite = new Composite(getShell(), SWT.NONE);
+			composite.setLayout(new GridLayout(8, false));
 			// org.eclipse.swt.widgets.Composite panel = new
 			// org.eclipse.swt.widgets.Composite(getShell(), SWT.NONE);
-			org.eclipse.swt.widgets.Label label = new org.eclipse.swt.widgets.Label(getShell(), SWT.NONE);
+			org.eclipse.swt.widgets.Label label = new org.eclipse.swt.widgets.Label(composite, SWT.NONE);
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			label.setText("  Record:");
-			mode = new org.eclipse.swt.widgets.Combo(getShell(), SWT.DROP_DOWN | SWT.READ_ONLY);
+			mode = new org.eclipse.swt.widgets.Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
 			mode.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			for (int i = 0; i < modes.length; i++)
 				mode.add(modes[i]);
@@ -112,22 +117,22 @@ public class Recorder extends PlugInFrame implements PlugIn, WindowSwt, Selectio
 			// panel.add(mode);
 			// panel.add(new Label(" Name:"));
 			// fileName = new Text(defaultName, 15);
-			fileName = new org.eclipse.swt.widgets.Text(getShell(), SWT.BORDER | SWT.SINGLE);
+			fileName = new org.eclipse.swt.widgets.Text(composite, SWT.BORDER | SWT.SINGLE);
 			fileName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			fileName.setText(defaultName);
 			setFileName();
 			// panel.add(fileName);
-			org.eclipse.swt.widgets.Label emptyLabel = new org.eclipse.swt.widgets.Label(getShell(), SWT.NONE);
+			org.eclipse.swt.widgets.Label emptyLabel = new org.eclipse.swt.widgets.Label(composite, SWT.NONE);
 			/*
 			 * emptyLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1,
 			 * 1)); emptyLabel.setText("   ");
 			 */
 			// panel.add(new Label(" "));
-			createButton = new org.eclipse.swt.widgets.Button(getShell(), SWT.NONE);
+			createButton = new org.eclipse.swt.widgets.Button(composite, SWT.NONE);
 			createButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			createButton.setText("Create");
 			createButton.addSelectionListener(Recorder.this);
-			runButton = new org.eclipse.swt.widgets.Button(getShell(), SWT.NONE);
+			runButton = new org.eclipse.swt.widgets.Button(composite, SWT.NONE);
 			runButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			runButton.setText("Run");
 			runButton.addSelectionListener(Recorder.this);
@@ -136,14 +141,14 @@ public class Recorder extends PlugInFrame implements PlugIn, WindowSwt, Selectio
 			// org.eclipse.swt.widgets.Label(getShell(), SWT.NONE);
 			// emptyLabel2.setText(" ");
 			// panel.add(new Label(" "));
-			helpButton = new org.eclipse.swt.widgets.Button(getShell(), SWT.NONE);
+			helpButton = new org.eclipse.swt.widgets.Button(composite, SWT.NONE);
 			helpButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 			helpButton.setText("?");
 			helpButton.addSelectionListener(Recorder.this);
 			// panel.pack();
 			// panel.add(help);
 			// add("North", panel);
-			textArea = new org.eclipse.swt.widgets.Text(getShell(), SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+			textArea = new org.eclipse.swt.widgets.Text(composite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 			textArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 8, 1));
 			textArea.addKeyListener(new org.eclipse.swt.events.KeyAdapter() {
 
@@ -1217,5 +1222,10 @@ public class Recorder extends PlugInFrame implements PlugIn, WindowSwt, Selectio
 	public void shellActivated(ShellEvent e) {
 
 		WindowManager.setWindow(this);
+	}
+
+	public Composite getComposite() {
+		
+		return composite;
 	}
 }
