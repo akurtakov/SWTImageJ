@@ -21,17 +21,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    container:
+      image: maven:3.9-eclipse-temurin-17
+
     steps:
     - name: Checkout SWT ImageJ
       uses: actions/checkout@v4
-      
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-        cache: 'maven'
 
     - name: Build with Maven
       env:
