@@ -12,6 +12,7 @@
   <equinox.common.suffix>_3.20.0.v20250129-1348</equinox.common.suffix>
   <jface.suffix>_3.36.0.v20250129-1243</jface.suffix>
   <jface.text.suffix>_3.27.0.v20250211-0938</jface.text.suffix>
+  <text.suffix>_3.14.300.v20250119-1501</text.suffix>
   <osgi.suffix>_3.23.0.v20250228-0640</osgi.suffix>
   <swt.suffix>_3.129.0.v20250221-1734</swt.suffix>
   <!-- org.eclipse.swt.win32.win32.x86_64 not found (swt.win32.suffix) -->
@@ -63,6 +64,13 @@
       <version>3.27.0</version>
       <scope>system</scope>
       <systemPath>${eclipse.home}/plugins/org.eclipse.jface.text${jface.text.suffix}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>org.eclipse.text</artifactId>
+      <version>3.14.300</version>
+      <scope>system</scope>
+      <systemPath>${eclipse.home}/plugins/org.eclipse.text${text.suffix}.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.eclipse</groupId>
@@ -151,28 +159,29 @@
   </profiles>
 
   <build>
-    <resources>
-      <resource>
-		<directory>${project.basedir}</directory>
-			<includes>
-				<include>IJ_Props.txt</include>
-			</includes>
-		</resource>
-		<resource>
-			<directory>${project.basedir}/images</directory>
-		</resource>
-		<resource>
-			<directory>${project.basedir}/macros</directory>
-			<targetPath>macros</targetPath>
-		</resource>
-		<resource>
-			<directory>${project.basedir}/plugins</directory>
-			<targetPath>ij/plugin</targetPath>
+  	<sourceDirectory>${project.basedir}</sourceDirectory>
+   <resources>
+			<resource>
+				<directory>${project.basedir}</directory>
+				<includes>
+					<include>IJ_Props.txt</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/images</directory>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/macros</directory>
+				<targetPath>macros</targetPath>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/plugins</directory>
+				<targetPath>ij/plugin</targetPath>
 				<includes>
 					<include>**/*.class</include>
 				</includes>
-		</resource>
-    </resources>
+			</resource>
+		</resources>
    <plugins>
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -199,13 +208,34 @@
               <shadedClassifierName>fat</shadedClassifierName>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>ij.ImageJ</mainClass>
+                  <manifestEntries>
+                  <Main-Class>ij.ImageJ</Main-Class>
+                  <Class-Path>libs/org.eclipse.core.commands-3.12.400.jar libs/org.eclipse.core.runtime-3.33.0.jar libs/org.eclipse.equinox.common-3.21.0.jar libs/org.eclipse.jface.text-3.27.0.jar libs/org.eclipse.text-3.14.300.jar libs/org.eclipse.jface-3.35.0.jar libs/org.eclipse.osgi-3.22.0.jar libs/org.eclipse.swt.cocoa-3.129.0.jar libs/org.eclipse.swt-3.129.0.jar</Class-Path>
+                  </manifestEntries>
                 </transformer>
               </transformers>
             </configuration>
           </execution>
         </executions>
       </plugin>
+      <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <executions>
+      <execution>
+        <id>copy-dependencies</id>
+        <phase>package</phase>
+        <goals>
+          <goal>copy-dependencies</goal>
+        </goals>
+        <configuration>
+          <outputDirectory>${project.build.directory}/libs</outputDirectory>
+          <overWriteReleases>false</overWriteReleases>
+          <overWriteSnapshots>true</overWriteSnapshots>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
   </plugins>
   </build>
   

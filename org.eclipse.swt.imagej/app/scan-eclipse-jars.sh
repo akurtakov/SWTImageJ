@@ -3,8 +3,8 @@
 ECLIPSE_PLUGINS="/Applications/Eclipse.app/Contents/Eclipse/plugins"
 
 # Parallel lists (same order and count!)
-LIB_KEYS="core.commands core.runtime equinox.common jface jface.text osgi swt swt.win32 swt.gtk swt.cocoa.x86_64 swt.cocoa.aarch64"
-LIB_VALUES="org.eclipse.core.commands org.eclipse.core.runtime org.eclipse.equinox.common org.eclipse.jface org.eclipse.jface.text org.eclipse.osgi org.eclipse.swt org.eclipse.swt.win32.win32.x86_64 org.eclipse.swt.gtk.linux.x86_64 org.eclipse.swt.cocoa.macosx.x86_64 org.eclipse.swt.cocoa.macosx.aarch64"
+LIB_KEYS="core.commands core.runtime equinox.common jface jface.text text osgi swt swt.win32 swt.gtk swt.cocoa.x86_64 swt.cocoa.aarch64"
+LIB_VALUES="org.eclipse.core.commands org.eclipse.core.runtime org.eclipse.equinox.common org.eclipse.jface org.eclipse.jface.text org.eclipse.text org.eclipse.osgi org.eclipse.swt org.eclipse.swt.win32.win32.x86_64 org.eclipse.swt.gtk.linux.x86_64 org.eclipse.swt.cocoa.macosx.x86_64 org.eclipse.swt.cocoa.macosx.aarch64"
 
 # Convert to arrays
 set -- $LIB_KEYS
