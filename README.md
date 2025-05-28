@@ -82,11 +82,7 @@ To start SWTImageJ on the command line execute the following commands:
 
 mvn clean package -Dosgi.platform=cocoa.macosx.aarch64 (for MacOSX aarch)
 
-or:
-
 mvn clean package -Dosgi.platform=gtk.linux.x86_64 (for Linux)
-
-or:
 
 mvn clean package -Dosgi.platform=win32.win32.x86_64 (for Windows)
 
