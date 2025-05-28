@@ -64,6 +64,8 @@ If you want to start it with another IDE put the required libraries on the Java 
 
 ### Maven Built and run SWTImageJ as a Desktop application
 
+Requirements: Java JDK and Maven already installed.
+
 SWTImagej can be built as an Eclipse plugin and also as a Desktop application.  
 
 After a new commit in the Github repository an Eclipse plugin built will be created automatically using a Jenkins built server. 
