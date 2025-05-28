@@ -48,7 +48,7 @@ Stack Overflow:   [https://stackoverflow.com/questions/tagged/imagej](https://st
 
 ImageJ Plugins: [https://imagej.net/ij/plugins/index.html](https://imagej.net/ij/plugins/index.html)
 
-### Run SWTImageJ
+### Run SWTImageJ in Eclipe
 
 To start SWTImageJ as an Desktop application simply import the plugin project into Eclipse. 
 
@@ -62,7 +62,45 @@ In Eclipse the needed SWT and Eclipe libraries should be available automatically
 
 If you want to start it with another IDE put the required libraries on the Java classpath see [info.txt](https://github.com/eclipse-swtimagej/SWTImageJ/blob/main/org.eclipse.swt.imagej/libs/info.txt) in the folder "libs".
 
-### Built SWTImageJ as a *.jar (not runnable)
+### Maven Built and run SWTImageJ as a Desktop application
+
+SWTImagej can be built as an Eclipse plugin and also as a Desktop application.  
+
+After a new commit in the Github repository an Eclipse plugin built will be created automatically using a Jenkins built server. 
+
+However to built SWTImageJ as a Desktop application (like the ImageJ application) a *.pom is available in the /app folder of the repository:
+
+https://github.com/eclipse-swtimagej/SWTImageJ/blob/develop/org.eclipse.swt.imagej/app/pom.xml
+
+Change your current directory to this folder.
+
+Important: Adjust the properties section in the *.pom to built SWTImageJ for your OS. 
+
+To start SWTImageJ on the command line execute the following commands:
+
+mvn clean package -Dosgi.platform=cocoa.macosx.aarch64 (for MacOSX aarch)
+or:
+mvn clean package -Dosgi.platform=gtk.linux.x86_64 (for Linux)
+or:
+mvn clean package -Dosgi.platform=win32.win32.x86_64 (for Windows)
+
+The built will package all binaries, folders, files and SWT/Eclipse dependencies in one executable *.jar.
+
+The built is located by default in the directory: /app/target
+
+Please also copy the following folders to the export folder of the created *.jar: plugins, macros, luts, images, about.jpg, functins.html.
+
+Change the directory to the directory of the export and then execute the *.jar with:
+
+Windows and Linux:
+
+java -jar SWTImageJ-1.5.0-SNAPSHOT-jar-with-dependencies.jar
+
+MacOSX:
+
+java -jar -XstartOnFirstThread SWTImageJ-1.5.0-SNAPSHOT-jar-with-dependencies.jar
+
+### Built SWTImageJ as an Eclipse *.jar (not runnable)
 
 To built SWTImageJ as a *.jar library use [Maven](https://maven.apache.org/) in the SWTImageJ directory with:
 
