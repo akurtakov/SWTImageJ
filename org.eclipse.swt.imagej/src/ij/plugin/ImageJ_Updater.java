@@ -13,7 +13,6 @@ import java.util.Vector;
 import ij.IJ;
 import ij.ImageJ;
 import ij.Menus;
-import ij.Prefs;
 import ij.gui.GenericDialog;
 
 
@@ -23,7 +22,11 @@ public class ImageJ_Updater implements PlugIn {
 	private String notes;
 
 	public void run(String arg) {
-		if (arg.equals("menus")) {
+		
+		IJ.showMessage("Updates are currently not available for SWTImageJ!");
+		return;
+		
+	/*	if (arg.equals("menus")) {
 			updateMenus();
 			return;
 		}
@@ -89,6 +92,7 @@ public class ImageJ_Updater implements PlugIn {
 		if (choice<count-2) // force macro Function Finder to download fresh list
 			new File(IJ.getDirectory("macros")+"functions.html").delete();
 		System.exit(0);
+		*/
 	}
 
 	int showDialog(String[] versions) {
