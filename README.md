@@ -70,7 +70,7 @@ SWTImagej can be built as an Eclipse plugin and also as a Desktop application.
 
 After a new commit in the Github repository an Eclipse plugin built will be created automatically using a Jenkins built server. 
 
-However to built SWTImageJ as a Desktop application (like the ImageJ application) a *.pom is available in the /app folder of the repository:
+However, to built SWTImageJ as a Desktop application (like the ImageJ application) a *.pom is available in the /app folder of the repository:
 
 https://github.com/eclipse-swtimagej/SWTImageJ/blob/develop/org.eclipse.swt.imagej/app/pom.xml
 
