@@ -90,17 +90,17 @@ The built will package all binaries, folders, files and SWT/Eclipse dependencies
 
 The built is located by default in the directory: /app/target
 
-Please also copy the following folders to the export folder of the created *.jar: plugins, macros, luts, images, about.jpg, functins.html.
+Please also copy the following folders and files to the export folder of the created *.jar: plugins, macros, luts, images, about.jpg, functins.html.
 
 Change the directory to the directory of the export and then execute the *.jar with:
 
 Windows and Linux:
 
-java -jar SWTImageJ-1.5.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar SWTImageJ-x.x.x-SNAPSHOT-jar-with-dependencies.jar
 
 MacOSX:
 
-java -jar -XstartOnFirstThread SWTImageJ-1.5.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar -XstartOnFirstThread SWTImageJ-x.x.x-SNAPSHOT-jar-with-dependencies.jar
 
 ### Built SWTImageJ as an Eclipse *.jar (not runnable)
 
