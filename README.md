@@ -78,7 +78,7 @@ Change your current directory to this folder.
 
 Important: Adjust the properties section in the *.pom to built SWTImageJ for your OS. 
 
-To start SWTImageJ on the command line execute the following commands:
+To built SWTImageJ on the command line execute the following commands:
 
 mvn clean package -Dosgi.platform=cocoa.macosx.aarch64 (for MacOSX aarch)
 
