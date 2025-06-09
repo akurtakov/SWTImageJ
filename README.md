@@ -90,7 +90,9 @@ The built will package all binaries, folders, files and SWT/Eclipse dependencies
 
 The built is located by default in the directory: /app/target
 
-Please also copy the following folders and files to the export folder of the created *.jar: plugins, macros, luts, images, about.jpg, functins.html.
+Please also copy the following folders and files to the export folder of the created *.jar: 
+
+plugins, macros, luts, images, about.jpg, functions.html.
 
 Change the directory to the directory of the export and then execute the *.jar with:
 
