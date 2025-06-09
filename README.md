@@ -48,7 +48,7 @@ Stack Overflow:   [https://stackoverflow.com/questions/tagged/imagej](https://st
 
 ImageJ Plugins: [https://imagej.net/ij/plugins/index.html](https://imagej.net/ij/plugins/index.html)
 
-### Run SWTImageJ in Eclipe
+### Run SWTImageJ in Eclipse
 
 To start SWTImageJ as an Desktop application simply import the plugin project into Eclipse. 
 
