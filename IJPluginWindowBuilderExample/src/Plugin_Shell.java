@@ -1,7 +1,8 @@
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Display;
+
 import ij.gui.GUI;
 import ij.plugin.frame.PlugInFrame;
 
