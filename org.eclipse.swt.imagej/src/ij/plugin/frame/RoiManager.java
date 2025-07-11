@@ -32,9 +32,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -141,6 +143,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 	protected Menu menu;
 	private Menu popup;
 	protected int[] selectionIndices;
+	private Composite composite;
 
 	/**
 	 * Opens the "ROI Manager" window, or activates it if it is already open.
@@ -151,18 +154,20 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 	public RoiManager() {
 
 		super("ROI Manager");// SWT.ON_TOP|SWT.SHELL_TRIM for on Top!
+		Display.getDefault().syncExec(() -> {
+			shell.setLayout(new FillLayout());
+
+			composite = new Composite(getShell(), SWT.NONE);
+		});
 		if (instance != null) {
 			WindowManager.toFront(instance);
 			return;
 		}
 		if (IJ.isMacro() && Interpreter.getBatchModeRoiManager() != null) {
-			list = new org.eclipse.swt.widgets.List(shell, SWT.VIRTUAL | SWT.V_SCROLL | SWT.MULTI);
-			// listModel = new DefaultListModel();
-			// list.setModel(listModel);
+			list = new org.eclipse.swt.widgets.List(composite, SWT.VIRTUAL | SWT.V_SCROLL | SWT.MULTI);
 			return;
 		}
 		instance = this;
-		// list = new org.eclipse.swt.widgets.List(this,SWT.NONE);
 		errorMessage = null;
 		Display.getDefault().syncExec(() -> {
 
@@ -185,13 +190,13 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 		 */
 		Display.getDefault().syncExec(() -> {
 
-			showAllCheckbox = new Button(shell, SWT.CHECK);
+			showAllCheckbox = new Button(composite, SWT.CHECK);
 			showAllCheckbox.setText("Show All");
 			showAllCheckbox.setSelection(false);
-			labelsCheckbox = new Button(shell, SWT.CHECK);
+			labelsCheckbox = new Button(composite, SWT.CHECK);
 			labelsCheckbox.setText("Labels");
 			labelsCheckbox.setSelection(false);
-			list = new org.eclipse.swt.widgets.List(shell, SWT.NONE);
+			list = new org.eclipse.swt.widgets.List(composite, SWT.NONE);
 
 		});
 		// listModel = new DefaultListModel();
@@ -207,34 +212,17 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 		shell.addMouseListener(this);
 		shell.addMouseWheelListener(this);
 		// list.setPrototypeCellValue("0000-0000-0000 ");
-		// list.addListSelectionListener(this);
-		// list.addKeyListener(ij);
-		// list.addMouseListener(this);
-		// list.addMouseWheelListener(this);
+
 		/* To do for SWT! */
 		WindowManager.addWindow(this);
-		// setLayout(new FlowLayout(FlowLayout.CENTER,5,5));
-		// setLayout(new BorderLayout());
-		/* List model not nedded for SWT! */
-		// listModel = new DefaultListModel();
-		// list.setModel(listModel);
-		// GUI.scale(list);
-		// list.setPrototypeCellValue("0000-0000-0000 ");
-		// list.addListSelectionListener(this);
-		// list.addKeyListener(ij);
-		// if (IJ.isLinux()) list.setBackground(Color.white);
-		// JScrollPane scrollPane = new JScrollPane(list,
-		// ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-		// ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		// add("Center", scrollPane);
-		// panel = new Canvas();
+
 		GridLayout gridLayout = new GridLayout(2, false);
 		gridLayout.verticalSpacing = 0;
 		gridLayout.horizontalSpacing = 0;
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
-		shell.setLayout(gridLayout);
-		list = new org.eclipse.swt.widgets.List(shell, SWT.VIRTUAL | SWT.V_SCROLL | SWT.MULTI);
+		composite.setLayout(gridLayout);
+		list = new org.eclipse.swt.widgets.List(composite, SWT.VIRTUAL | SWT.V_SCROLL | SWT.MULTI);
 		// list.setFont( new org.eclipse.swt.graphics.Font(Display.getDefault(),"Menlo",
 		// 14, SWT.NORMAL ) );
 		list.addSelectionListener(new SelectionAdapter() {
@@ -251,7 +239,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 		gd_list.heightHint = 263;
 		gd_list.widthHint = 150;
 		list.setLayoutData(gd_list);
-		Button addTButton = new Button(shell, SWT.NONE);
+		Button addTButton = new Button(composite, SWT.NONE);
 		addTButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		addTButton.setText("Add [t]");
 		addTButton.addSelectionListener(new SelectionAdapter() {
@@ -262,7 +250,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Add [t]");
 			}
 		});
-		Button updateButton = new Button(shell, SWT.NONE);
+		Button updateButton = new Button(composite, SWT.NONE);
 		updateButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		updateButton.setText("Update");
 		updateButton.addSelectionListener(new SelectionAdapter() {
@@ -273,7 +261,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Update");
 			}
 		});
-		Button deleteButton = new Button(shell, SWT.NONE);
+		Button deleteButton = new Button(composite, SWT.NONE);
 		deleteButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		deleteButton.setText("Delete");
 		deleteButton.addSelectionListener(new SelectionAdapter() {
@@ -284,7 +272,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Delete");
 			}
 		});
-		Button renameButton = new Button(shell, SWT.NONE);
+		Button renameButton = new Button(composite, SWT.NONE);
 		renameButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		renameButton.setText("Rename...");
 		renameButton.addSelectionListener(new SelectionAdapter() {
@@ -295,7 +283,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Rename...");
 			}
 		});
-		Button measureButton = new Button(shell, SWT.NONE);
+		Button measureButton = new Button(composite, SWT.NONE);
 		measureButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		measureButton.setText("Measure");
 		measureButton.addSelectionListener(new SelectionAdapter() {
@@ -306,7 +294,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Measure");
 			}
 		});
-		Button deselectButton = new Button(shell, SWT.NONE);
+		Button deselectButton = new Button(composite, SWT.NONE);
 		deselectButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		deselectButton.setText("Deselect");
 		deselectButton.addSelectionListener(new SelectionAdapter() {
@@ -317,7 +305,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Deselect");
 			}
 		});
-		Button propertiesButton = new Button(shell, SWT.NONE);
+		Button propertiesButton = new Button(composite, SWT.NONE);
 		propertiesButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		propertiesButton.setText("Properties...");
 		propertiesButton.addSelectionListener(new SelectionAdapter() {
@@ -328,7 +316,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Properties...");
 			}
 		});
-		Button flattenButton = new Button(shell, SWT.NONE);
+		Button flattenButton = new Button(composite, SWT.NONE);
 		flattenButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		flattenButton.setText("Flatten[F]");
 		flattenButton.addSelectionListener(new SelectionAdapter() {
@@ -339,7 +327,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				actionPerformed("Flatten[F]");
 			}
 		});
-		moreButton = new Button(shell, SWT.NONE);
+		moreButton = new Button(composite, SWT.NONE);
 		moreButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		moreButton.setText("More >>");
 		moreButton.addSelectionListener(new SelectionAdapter() {
@@ -369,7 +357,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 		addPopupMenu();
 		// GUI.scale(this);
 		shell.pack();
-		showAllCheckbox = new Button(shell, SWT.CHECK);
+		showAllCheckbox = new Button(composite, SWT.CHECK);
 		GridData gd_showAllCheckbox = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
 		gd_showAllCheckbox.heightHint = 25;
 		showAllCheckbox.setLayoutData(gd_showAllCheckbox);
@@ -383,7 +371,7 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 			}
 		});
 		showAllCheckbox.setSelection(false);
-		labelsCheckbox = new Button(shell, SWT.CHECK);
+		labelsCheckbox = new Button(composite, SWT.CHECK);
 		GridData gd_labelsCheckbox = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
 		gd_labelsCheckbox.heightHint = 25;
 		labelsCheckbox.setLayoutData(gd_labelsCheckbox);
@@ -397,9 +385,9 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 			}
 		});
 		labelsCheckbox.setSelection(false);
-		new Label(shell, SWT.NONE);
-		new Label(shell, SWT.NONE);
-		new Label(shell, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
+		new Label(composite, SWT.NONE);
 		org.eclipse.swt.graphics.Point size = shell.getSize();
 		if (size.x > 270)
 			shell.setSize(size.x - 40, size.y);
