@@ -154,10 +154,12 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 	public RoiManager() {
 
 		super("ROI Manager");// SWT.ON_TOP|SWT.SHELL_TRIM for on Top!
+
 		Display.getDefault().syncExec(() -> {
 			shell.setLayout(new FillLayout());
-
-			composite = new Composite(getShell(), SWT.NONE);
+			if (composite == null) {
+				composite = new Composite(getShell(), SWT.NONE);
+			}
 		});
 		if (instance != null) {
 			WindowManager.toFront(instance);
@@ -183,6 +185,11 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 	public RoiManager(boolean b) {
 
 		super("ROI Manager");
+		Display.getDefault().syncExec(() -> {
+			shell.setLayout(new FillLayout());
+
+			composite = new Composite(getShell(), SWT.NONE);
+		});
 		/*
 		 * Normally the two buttons are created in the variable declaration of this
 		 * class for the headless execution. This two buttons have to be available but
@@ -3743,5 +3750,13 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 	public org.eclipse.swt.widgets.List getSwtList() {
 
 		return list;
+	}
+
+	public Composite getComposite() {
+		return composite;
+	}
+
+	public void setComposite(Composite composite) {
+		this.composite = composite;
 	}
 }
