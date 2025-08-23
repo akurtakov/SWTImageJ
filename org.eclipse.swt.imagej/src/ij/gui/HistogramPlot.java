@@ -94,6 +94,10 @@ public class HistogramPlot extends ImagePlus {
 		draw(imp, stats);
 	}
 
+	/**
+	 * For RGB images in mode 'RGB' = R+G+B, i.e., the sum of the red + green + blue
+	 * histograms, we create an image of the three color channels next to each other
+	 */
 	private ImageStatistics RGBHistogram(ImagePlus imp, int bins, double histMin, double histMax) {
 
 		ImageProcessor ip = (ColorProcessor) imp.getProcessor();
@@ -233,10 +237,19 @@ public class HistogramPlot extends ImagePlus {
 	}
 
 	void drawPlot(long maxCount, ImageProcessor ip) {
+		if (frame == null)
+			frame = getDefaultFrame();
+		drawPlot(histogram, maxCount, ip, frame, frameColor);
+	}
 
+	/**
+	 * Draws the histogram with linear scaling and the frame. Also used by
+	 * HistogramWindow
+	 */
+
+	static void drawPlot(long[] histogram, long maxCount, ImageProcessor ip, Rectangle frame, Color frameColor) {
 		if (maxCount == 0)
 			maxCount = 1;
-		frame = new Rectangle(XMARGIN, YMARGIN, HIST_WIDTH, HIST_HEIGHT);
 		if (histogram.length == 256) {
 			double scale2 = HIST_WIDTH / 256.0;
 			int barWidth = 1;
@@ -280,10 +293,19 @@ public class HistogramPlot extends ImagePlus {
 	}
 
 	void drawLogPlot(long maxCount, ImageProcessor ip) {
+		if (frame == null)
+			frame = getDefaultFrame();
+		drawLogPlot(histogram, maxCount, ip, frame);
+	}
 
-		frame = new Rectangle(XMARGIN, YMARGIN, HIST_WIDTH, HIST_HEIGHT);
+	/**
+	 * Draws the logarithm of histogram values in gray. To be called before the
+	 * regular plot, which is then in the foreground. Also used by HistogramWindow
+	 */
+
+	static void drawLogPlot(long[] histogram, long maxCount, ImageProcessor ip, Rectangle frame) {
 		ip.drawRect(frame.x - 1, frame.y, frame.width + 2, frame.height + 1);
-		double max = Math.log(maxCount);
+		double max = Math.log(maxCount + 0.5);
 		ip.setColor(Color.gray);
 		if (histogram.length == 256) {
 			double scale2 = HIST_WIDTH / 256.0;
@@ -294,7 +316,7 @@ public class HistogramPlot extends ImagePlus {
 				barWidth = 3;
 			for (int i = 0; i < 256; i++) {
 				int x = (int) (i * scale2);
-				int y = histogram[i] == 0 ? 0 : (int) (HIST_HEIGHT * Math.log(histogram[i]) / max);
+				int y = histogram[i] == 0 ? 0 : (int) Math.max(HIST_HEIGHT * Math.log(histogram[i] + 0.5) / max, 1);
 				if (y > HIST_HEIGHT)
 					y = HIST_HEIGHT;
 				for (int j = 0; j < barWidth; j++)
@@ -304,7 +326,7 @@ public class HistogramPlot extends ImagePlus {
 			int index, y;
 			for (int i = 0; i < HIST_WIDTH; i++) {
 				index = (int) (i * (double) histogram.length / HIST_WIDTH);
-				y = histogram[index] == 0 ? 0 : (int) (HIST_HEIGHT * Math.log(histogram[index]) / max);
+				y = histogram[index] == 0 ? 0 : (int) Math.max(HIST_HEIGHT * Math.log(histogram[index] + 0.5) / max, 1);
 				if (y > HIST_HEIGHT)
 					y = HIST_HEIGHT;
 				ip.drawLine(i + XMARGIN, YMARGIN + HIST_HEIGHT, i + XMARGIN, YMARGIN + HIST_HEIGHT - y);
@@ -314,7 +336,7 @@ public class HistogramPlot extends ImagePlus {
 			for (int i = 0; i < histogram.length; i++) {
 				long value = histogram[i];
 				if (value > 0L) {
-					int y = (int) (HIST_HEIGHT * Math.log(value) / max);
+					int y = (int) Math.max(HIST_HEIGHT * Math.log(value + 0.5) / max, 1);
 					if (y > HIST_HEIGHT)
 						y = HIST_HEIGHT;
 					int x = (int) (i * xscale) + XMARGIN;
@@ -403,6 +425,17 @@ public class HistogramPlot extends ImagePlus {
 		}
 	}
 
+	/**
+	 * Returns the default frame size. This is the size of the plot area excluding
+	 * the line around.
+	 */
+
+	static Rectangle getDefaultFrame() {
+
+		return new Rectangle(XMARGIN, YMARGIN, HIST_WIDTH, HIST_HEIGHT);
+
+	}
+
 	private String d2s(double d) {
 
 		if ((int) d == d)
@@ -434,7 +467,8 @@ public class HistogramPlot extends ImagePlus {
 
 	@Override
 	public void show() {
-
+		if (frame == null)
+			frame = getDefaultFrame();
 		Display.getDefault().syncExec(() -> {
 			HistogramWindow hw = new HistogramWindow(HistogramPlot.this, WindowManager.getImage(srcImageID));
 			try {

@@ -8,7 +8,6 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.InputEvent;
@@ -1634,9 +1633,7 @@ public class IJ {
 		ImagePlus img = getImage();
 		Roi roi = img.getRoi();
 		if (shiftKeyDown() && roi != null && roi.getType() == Roi.POINT) {
-			Polygon p = roi.getPolygon();
-			p.addPoint(x, y);
-			img.setRoi(new PointRoi(p.xpoints, p.ypoints, p.npoints));
+			((PointRoi)roi).addUserPoint(null, x, y);
 			IJ.setKeyUp(KeyEvent.VK_SHIFT);
 		} else if (altKeyDown() && roi != null && roi.getType() == Roi.POINT) {
 			((PolygonRoi) roi).deleteHandle(x, y);
@@ -1651,9 +1648,7 @@ public class IJ {
 		ImagePlus img = getImage();
 		Roi roi = img.getRoi();
 		if (shiftKeyDown() && roi != null && roi.getType() == Roi.POINT) {
-			Polygon p = roi.getPolygon();
-			p.addPoint((int) Math.round(x), (int) Math.round(y));
-			img.setRoi(new PointRoi(p.xpoints, p.ypoints, p.npoints));
+			((PointRoi)roi).addUserPoint(null, x, y);
 			IJ.setKeyUp(KeyEvent.VK_SHIFT);
 		} else if (altKeyDown() && roi != null && roi.getType() == Roi.POINT) {
 			((PolygonRoi) roi).deleteHandle(x, y);
