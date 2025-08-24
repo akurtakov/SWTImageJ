@@ -11,7 +11,7 @@ public class Gamma_Adjuster implements PlugIn {
       final ImageProcessor ip = img.getProcessor();
       ip.snapshot();
       DialogListener listener = new DialogListener() {
-         public boolean dialogItemChanged(GenericDialog gd, AWTEvent event) {
+         public boolean dialogItemChanged(GenericDialog gd, TypedEvent event) {
             double gamma = gd.getNextNumber();
             ip.reset();
             ip.gamma(gamma);
