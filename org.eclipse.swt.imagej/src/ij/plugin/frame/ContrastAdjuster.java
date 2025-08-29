@@ -9,6 +9,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -59,6 +61,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 	static final String[] channelLabels = { "Red", "Green", "Blue", "Cyan", "Magenta", "Yellow", "All" };
 	static final String[] altChannelLabels = { "Channel 1", "Channel 2", "Channel 3", "Channel 4", "Channel 5",
 			"Channel 6", "All" };
+	static final String[] greyChannelLabels = { "LUT level" };
 	static final int[] channelConstants = { 4, 2, 1, 3, 5, 6, 7 };
 	ContrastPlot plot;
 	Thread thread;
@@ -91,6 +94,8 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 	org.eclipse.swt.graphics.Font sanFont = IJ.font12Swt;
 	int channels = 7; // RGB
 	org.eclipse.swt.widgets.Combo choice;
+	org.eclipse.swt.widgets.Button logHistCheckbox;
+	boolean isLogHist = false;
 	private String blankLabel8 = "--------";
 	private String blankLabel12 = "------------";
 	private double scale = Prefs.getGuiScale();
@@ -186,6 +191,12 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 				// add(panel);
 				blankLabel8 = "        ";
 			}
+			logHistCheckbox = new org.eclipse.swt.widgets.Button(panel, SWT.CHECK);
+			logHistCheckbox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			logHistCheckbox.setSelection(isLogHist);
+			logHistCheckbox.setText("Log scale");
+			logHistCheckbox.addSelectionListener(ContrastAdjuster.this);
+			// logHistCheckbox.addKeyListener(ij);
 			// min slider
 			if (!windowLevel) {
 				minSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
@@ -339,6 +350,12 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 		if (imp != null && imp.isComposite()) {
 			for (int i = 0; i < altChannelLabels.length; i++)
 				choice.add(altChannelLabels[i]);
+		} else if (imp != null && ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16)
+				|| (imp.getType() == ImagePlus.GRAY32))) {
+
+			for (int i = 0; i < greyChannelLabels.length; i++)
+
+				choice.add(greyChannelLabels[i]);
 		} else {
 			for (int i = 0; i < channelLabels.length; i++)
 				choice.add(channelLabels[i]);
@@ -404,8 +421,14 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			adjustmentValueChanged(e);
 		} else if (e.widget instanceof org.eclipse.swt.widgets.Combo) {
 			itemStateChanged(e);
-		} else {
-			actionPerformed(e);
+		} else if (e.widget instanceof org.eclipse.swt.widgets.Button) {
+			org.eclipse.swt.widgets.Button button = (org.eclipse.swt.widgets.Button) e.widget;
+			int style = button.getStyle();
+			if ((style & SWT.CHECK) != 0) {
+				itemStateChanged(e);
+			} else {
+				actionPerformed(e);
+			}
 		}
 	}
 
@@ -497,15 +520,24 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			if (imp.isComposite()) {
 				int channel = imp.getChannel();
 				if (channel <= 4) {
+					choice.removeAll();
+					addBalanceChoices();
 					choice.select(channel - 1);
 					channels = channelConstants[channel - 1];
 				}
-				if (choice.getItem(0).equals("Red")) {
+				if (!choice.getItem(0).equals("Channel 1")) { // if the choice is wrong
+					choice.removeAll();
+					addBalanceChoices();
+				}
+			} else if ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16)
+					|| (imp.getType() == ImagePlus.GRAY32)) { // grey image
+
+				if (!choice.getItem(0).equals("LUT level")) { // if the choice is wrong
 					choice.removeAll();
 					addBalanceChoices();
 				}
 			} else { // not composite
-				if (choice.getItem(0).equals("Channel 1")) {
+				if (!choice.getItem(0).equals("Red")) { // if the choice is wrong
 					choice.removeAll();
 					addBalanceChoices();
 				}
@@ -756,6 +788,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 
 		ImageStatistics stats;
 		if (balance && (channels == 4 || channels == 2 || channels == 1) && imp.getType() == ImagePlus.COLOR_RGB) {
+			setTitle("Color");
 			int w = imp.getWidth();
 			int h = imp.getHeight();
 			byte[] r = new byte[w * h];
@@ -772,6 +805,13 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			ImageProcessor ip = new ByteProcessor(w, h, pixels, null);
 			stats = ImageStatistics.getStatistics(ip, 0, imp.getCalibration());
 		} else {
+			if (balance) {
+				setTitle("Color");
+			}
+			if (balance && ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16)
+					|| (imp.getType() == ImagePlus.GRAY32)) && !imp.isComposite()) { // image is grey
+				setTitle("LUT Color");
+			}
 			int range = imp.getType() == ImagePlus.GRAY16 ? ImagePlus.getDefault16bitRange() : 0;
 			if (range != 0 && imp.getProcessor().getMax() == Math.pow(2, range) - 1
 					&& !(imp.getCalibration().isSigned16Bit())) {
@@ -780,14 +820,9 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			} else
 				stats = imp.getStatistics();
 		}
-		Display.getDefault().syncExec(() -> {
-
-			color = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
-
-		});
-		if (imp.isComposite() && !(balance && channels == 7))
-			color = ((CompositeImage) imp).getChannelColor();
-		plot.setHistogram(stats, color);
+		// Default histogram color for images without LUT is now defined in the
+		// setHistogram method
+		plot.setHistogram(stats, isLogHist);
 	}
 
 	void apply(ImagePlus imp, ImageProcessor ip) {
@@ -1380,6 +1415,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			adjustContrast(imp, ip, cvalue);
 			break;
 		}
+		plotHistogram(imp);
 		updatePlot();
 		updateLabels(imp);
 		if ((IJ.shiftKeyDown() || (balance && channels == 7)) && imp.isComposite())
@@ -1436,19 +1472,36 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 
 	public synchronized void itemStateChanged(SelectionEvent e) {
 
-		int index = choice.getSelectionIndex();
-		channels = channelConstants[index];
-		ImagePlus imp = WindowManager.getCurrentImage();
-		if (imp != null && imp.isComposite()) {
-			if (index + 1 <= imp.getNChannels())
-				imp.setPosition(index + 1, imp.getSlice(), imp.getFrame());
-			else {
-				choice.select(channelLabels.length - 1);
-				channels = 7;
+		Object source = e.getSource();
+		if (source == logHistCheckbox) {
+			isLogHist = logHistCheckbox.getSelection();
+			// IJ.log("log state changed");
+			ImagePlus imp = WindowManager.getCurrentImage();
+			if (imp != null) {
+				// IJ.log("now updating histogram from itemStateChanged "+imp);
+
+				plotHistogram(imp);
+				updatePlot();
+				updateLabels(imp);
 			}
 		} else {
-			imp.getProcessor().snapshot();
-			doReset = true;
+			int index = choice.getSelectionIndex();
+			channels = channelConstants[index];
+			ImagePlus imp = WindowManager.getCurrentImage();
+			if (imp != null) {
+				if (imp.isComposite()) {
+					if (index + 1 <= imp.getNChannels())
+						imp.setPosition(index + 1, imp.getSlice(), imp.getFrame());
+					else {
+						choice.select(channelLabels.length - 1);
+						channels = 7;
+					}
+				} else {
+					imp.getProcessor().snapshot();
+					doReset = true;
+				}
+			}
+
 		}
 		notify();
 	}
@@ -1484,7 +1537,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 
 class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 		implements org.eclipse.swt.events.MouseListener, PaintListener {
-
+	Color[] hColors;
 	static final int WIDTH = 161, HEIGHT = 64;
 	double defaultMin = 0;
 	double defaultMax = 255;
@@ -1503,6 +1556,8 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 
 		super(shell, SWT.DOUBLE_BUFFERED);
 		addMouseListener(this);
+		width = (int) (width * 1.3); // increase size
+		height = (int) (height * 1.3); // increase size
 		addPaintListener(this);
 		/*
 		 * if (scale > 1.0) { width = (int) (width * scale); height = (int) (height *
@@ -1520,10 +1575,39 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 		return new Dimension(width + 1, height + 1);
 	}
 
-	void setHistogram(ImageStatistics stats, org.eclipse.swt.graphics.Color color) {
-
-		this.color = color;
+	void setHistogram(ImageStatistics stats, boolean isLogHist) {
 		histogram = stats.histogram;
+		if (isLogHist) {
+			for (int j = 0; j < 256; j++) {
+				histogram[j] = (int) (Math.log(histogram[j]) * 100);
+			}
+		}
+		ImagePlus imp = WindowManager.getCurrentImage();
+		hColors = new Color[256];
+		for (int i = 0; i < 256; i++) { // set the default histogram color when there is no LUT
+			hColors[i] = new Color(110, 110, 150);
+		}
+		int impType = imp.getType();
+		if ((impType == ImagePlus.GRAY8) || (impType == ImagePlus.GRAY16) || (impType == ImagePlus.GRAY32)) { // if
+																												// image
+																												// has
+																												// LUT
+			ImageProcessor ip = imp.getProcessor();
+			ColorModel cm = ip.getColorModel();
+			IndexColorModel icm = (IndexColorModel) cm;
+			int mapSize = icm.getMapSize();
+			if (mapSize != 256)
+				return;
+			byte[] red = new byte[256];
+			byte[] green = new byte[256];
+			byte[] blue = new byte[256];
+			icm.getReds(red);
+			icm.getGreens(green);
+			icm.getBlues(blue);
+			for (int i = 0; i < 256; i++) {
+				hColors[i] = new Color(red[i] & 255, green[i] & 255, blue[i] & 255);
+			}
+		}
 		if (histogram.length != 256) {
 			histogram = null;
 			return;
@@ -1541,13 +1625,18 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 			if ((histogram[i] > maxCount2) && (i != mode))
 				maxCount2 = histogram[i];
 		}
-		hmax = stats.maxCount;
+		if (isLogHist) {
+			hmax = (int) (Math.log(stats.maxCount) * 100);
+		} else {
+			hmax = stats.maxCount;
+		}
 		if ((hmax > (maxCount2 * 2)) && (maxCount2 != 0)) {
 			hmax = (int) (maxCount2 * 1.5);
 			histogram[mode] = hmax;
 		}
 		if (os != null && os.isDisposed() == false)
 			os.dispose();
+
 		os = null;
 	}
 
@@ -1574,9 +1663,17 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 
 	public void paint(GC gc) {
 
-		int x1, y1, x2, y2;
+		int x1, y1, x2, y2, j, j1, j2;
+		double colscale;
 		double scale = (double) width / (defaultMax - defaultMin);
 		double slope = 0.0;
+		j1 = (int) ((min - defaultMin) / (defaultMax - defaultMin) * 255);
+		j2 = (int) ((max - defaultMin) / (defaultMax - defaultMin) * 255);
+		if (j2 > j1) {
+			colscale = 255.0 / (j2 - j1);
+		} else {
+			colscale = 1;
+		}
 		if (max != min)
 			slope = height / (max - min);
 		if (min >= defaultMin) {
@@ -1605,11 +1702,34 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 				gcos = new GC(os);
 				gcos.setForeground(ij.swt.Color.white);
 				gcos.fillRectangle(0, 0, width, height);
-				gcos.setForeground(color);
+
 				double scale2 = width / 256.0;
 				for (int i = 0; i < 256; i++) {
 					int x = (int) (i * scale2);
-					gcos.drawLine(x, height, x, height - ((int) (height * histogram[i]) / hmax));
+					j = (int) ((i - j1) * colscale);
+
+					if (i < j1) {
+						j = 0;
+					}
+					;
+
+					if (i > j2) {
+						j = 255;
+					}
+					;
+
+					// IJ.log("--> "+String.valueOf(j1)+" "+String.valueOf(j2)+"
+					// "+String.valueOf(i)+" "+String.valueOf(j));
+					if (hColors != null)
+						gcos.setForeground(hColors[j]);
+					int y = height - ((int) (height * histogram[i]) / hmax);
+					gcos.drawLine(x, height, x, y);
+					gcos.setForeground(ij.swt.Color.black);
+					gcos.fillRectangle(x, y, 1, 1);
+
+					// IJ.log("--> "+String.valueOf(i)+" "+String.valueOf(x)+"
+					// "+String.valueOf(histogram[i])+" "+String.valueOf(height -
+					// ((int)(height*histogram[i])/hmax)));
 				}
 				// osg.dispose();
 			}
