@@ -1456,7 +1456,7 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 			dir = "BeanShell/";
 		else if (isPython)
 			dir = "Python/";
-		String url = "https://raw.githubusercontent.com/eclipse-swtimagej/SWTImageJ/refs/heads/develop/org.eclipse.swt.imagej/macros/Examples/" + dir + name;
+		String url = "https://wsr.imagej.net/download/Examples/" + dir + name;
 		text = IJ.openUrlAsString(url);
 		if (text.startsWith("<Error: ")) {
 			IJ.error("Open Example", text);

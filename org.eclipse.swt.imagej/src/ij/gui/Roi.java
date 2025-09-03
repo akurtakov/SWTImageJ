@@ -2635,7 +2635,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	 */
 	public final int getZPosition() {
 
-		return slice == 0 && !hyperstackPosition ? position : slice;
+		return slice==0&&!hyperstackPosition ? getPosition() : slice;
 	}
 
 	/**
