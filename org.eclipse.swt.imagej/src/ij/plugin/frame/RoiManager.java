@@ -1056,8 +1056,6 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 		Roi roi = (Roi) rois.get(index);
 		if (imp == null || roi == null)
 			return false;
-		// IJ.log("restore: "+roi.getPosition()+" "+roi.getZPosition()+"
-		// "+imp.getNSlices()+" "+imp.getStackSize());
 		if (setSlice) {
 			boolean hyperstack = imp.isHyperStack();
 			int position = roi.getPosition();
@@ -3407,7 +3405,6 @@ public class RoiManager extends PlugInFrame implements MouseListener, MouseWheel
 				index = 0;
 			if (index >= getCount())
 				index = getCount();
-			// IJ.log(index+" "+rot);
 			select(index);
 			if (IJ.isWindows())
 				// list.requestFocusInWindow();

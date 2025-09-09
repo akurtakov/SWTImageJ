@@ -144,7 +144,6 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	private String name;
 	private int position;
 	private int channel, slice, frame;
-	protected boolean hyperstackPosition;
 	private Overlay prototypeOverlay;
 	private boolean subPixel;
 	private boolean activeOverlayRoi;
@@ -2116,7 +2115,6 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 				temp[i] = groupNames[i];
 			groupNames = temp;
 		}
-		// IJ.log("setGroupName: "+groupNumber+" "+name+" "+groupNames.length);
 		groupNames[groupNumber - 1] = name;
 		groupNamesChanged = true;
 	}
@@ -2540,7 +2538,6 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			n = 0;
 		position = n;
 		channel = slice = frame = 0;
-		hyperstackPosition = false;
 	}
 
 	/**
@@ -2594,13 +2591,14 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			frame = 0;
 		this.frame = frame;
 		position = 0;
-		hyperstackPosition = true;
 	}
 
 	/** Returns 'true' if setPosition(C,Z,T) has been called. */
 	public boolean hasHyperStackPosition() {
-
-		return hyperstackPosition;
+		if (getPosition()==PointRoi.POINTWISE_POSITION)
+			return false;
+		else
+			return channel>0 || slice>0 || frame>0;
 	}
 
 	/**
@@ -2635,7 +2633,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	 */
 	public final int getZPosition() {
 
-		return slice==0&&!hyperstackPosition ? getPosition() : slice;
+		return slice==0&&!hasHyperStackPosition() ? getPosition() : slice;
 	}
 
 	/**
