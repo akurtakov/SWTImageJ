@@ -1142,16 +1142,16 @@ public class PolygonRoi extends Roi {
 		if (xSpline == null || xSpline.length != evaluationPoints) {
 			xSpline = new float[evaluationPoints];
 			/* Create an extra array for an anisotropic view! */
-			if (ic.isFitToParent()) {
-				xSplineTemp = new float[evaluationPoints];
-			}
+
+			//xSplineTemp = new float[evaluationPoints];
+
 		}
 		if (ySpline == null || ySpline.length != evaluationPoints) {
 			ySpline = new float[evaluationPoints];
 			/* Create an extra array for an anisotropic view! */
-			if (ic.isFitToParent()) {
-				ySplineTemp = new float[evaluationPoints];
-			}
+
+			//ySplineTemp = new float[evaluationPoints];
+
 		}
 		int nNodes = isLine() ? nPoints : nPoints + 1;
 		double length = getUncalibratedLength();
