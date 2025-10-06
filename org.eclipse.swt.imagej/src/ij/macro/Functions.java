@@ -663,7 +663,7 @@ public class Functions implements MacroConstants, Measurements {
 			value = fit();
 			break;
 		case OVERLAY:
-			value = overlay();
+			value = doOverlay();
 			break;
 		case SELECTION_CONTAINS:
 			value = selectionContains();
@@ -7830,8 +7830,7 @@ public class Functions implements MacroConstants, Measurements {
 			IJ.renameResults(arg1);
 	}
 
-	double overlay() {
-
+	double doOverlay() {
 		interp.getToken();
 		if (interp.token != '.')
 			interp.error("'.' expected");
