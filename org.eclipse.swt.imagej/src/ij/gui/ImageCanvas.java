@@ -1203,6 +1203,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		Display.getDefault().syncExec(() -> {
 
 			layout();
+			
 
 		});
 	}

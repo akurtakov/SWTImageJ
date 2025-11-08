@@ -49,8 +49,8 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	static final String FONT_ANTI = "tw.font.anti";
 	TextPanel textPanel;
 	MenuItem monospacedButton, antialiasedButton;
-	int[] sizes = { 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 36, 48, 60, 72 };
-	int fontSize = (int) Prefs.get(FONT_SIZE, 6);
+	int[] sizes = {9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 36, 48, 60, 72};
+	int fontSize = (int)Prefs.get(FONT_SIZE, 6);
 	org.eclipse.swt.widgets.Menu mb;
 	private Shell shell;
 	protected String title;
@@ -68,10 +68,14 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	/**
 	 * Opens a new single-column text window.
 	 * 
-	 * @param title  the title of the window
-	 * @param text   the text initially displayed in the window
-	 * @param width  the width of the window in pixels
-	 * @param height the height of the window in pixels
+	 * @param title
+	 *            the title of the window
+	 * @param text
+	 *            the text initially displayed in the window
+	 * @param width
+	 *            the width of the window in pixels
+	 * @param height
+	 *            the height of the window in pixels
 	 */
 	public TextWindow(String title, String text, int width, int height) {
 
@@ -81,17 +85,21 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	/**
 	 * Opens a new multi-column text window.
 	 * 
-	 * @param title    title of the window
-	 * @param headings the tab-delimited column headings
-	 * @param text     text initially displayed in the window
-	 * @param width    width of the window in pixels
-	 * @param height   height of the window in pixels
+	 * @param title
+	 *            title of the window
+	 * @param headings
+	 *            the tab-delimited column headings
+	 * @param text
+	 *            text initially displayed in the window
+	 * @param width
+	 *            width of the window in pixels
+	 * @param height
+	 *            height of the window in pixels
 	 */
 	public TextWindow(String title, String headings, String text, int width, int height) {
 
 		// super(title);
 		Display.getDefault().syncExec(() -> {
-
 			shell = new Shell(Display.getDefault(), SWT.MODELESS | SWT.DIALOG_TRIM | SWT.RESIZE);
 			org.eclipse.swt.layout.GridLayout layout = new org.eclipse.swt.layout.GridLayout(2, false);
 			shell.setLayout(layout);
@@ -99,36 +107,38 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 			shell.setText(title);
 			textPanel = new TextPanel(TextWindow.this, shell, title);
 			textPanel.setColumnHeadings(headings);
-			if (text != null && !text.equals(""))
+			if(text != null && !text.equals(""))
 				textPanel.append(text);
 			create(title, textPanel, width, height);
-
 		});
 	}
 
 	/**
 	 * Opens a new multi-column text window.
 	 * 
-	 * @param title    title of the window
-	 * @param headings tab-delimited column headings
-	 * @param text     ArrayList containing the text to be displayed in the window
-	 * @param width    width of the window in pixels
-	 * @param height   height of the window in pixels
+	 * @param title
+	 *            title of the window
+	 * @param headings
+	 *            tab-delimited column headings
+	 * @param text
+	 *            ArrayList containing the text to be displayed in the window
+	 * @param width
+	 *            width of the window in pixels
+	 * @param height
+	 *            height of the window in pixels
 	 */
 	public TextWindow(String title, String headings, ArrayList text, int width, int height) {
 
 		Display.getDefault().syncExec(() -> {
-
 			// super(title);
 			shell = new Shell(Display.getDefault(), SWT.MODELESS | SWT.DIALOG_TRIM | SWT.RESIZE);
 			shell.setLayout(new org.eclipse.swt.layout.GridLayout(2, false));
 			setTitle(title);
 			textPanel = new TextPanel(TextWindow.this, shell, title);
 			textPanel.setColumnHeadings(headings);
-			if (text != null)
+			if(text != null)
 				textPanel.append(text);
 			create(title, textPanel, width, height);
-
 		});
 		WindowManager.setWindow(this);
 	}
@@ -141,7 +151,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		shell.addKeyListener(textPanel);
 		shell.addShellListener(TextWindow.this);
 		ImageJ ij = IJ.getInstance();
-		if (ij != null) {
+		if(ij != null) {
 			/* Changed for SWT to do! */
 			/*
 			 * textPanel.addKeyListener(ij); if (!IJ.isMacOSX()) { Image img =
@@ -152,7 +162,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		shell.addFocusListener(TextWindow.this);
 		String title2 = getTitle();
 		isResultsTable = title2.equals("Results");
-		if (!isResultsTable && title2.endsWith("(Results)")) {
+		if(!isResultsTable && title2.endsWith("(Results)")) {
 			isResultsTable = true;
 			title2 = title2.substring(0, title2.length() - 9);
 			setTitle(title2);
@@ -164,25 +174,25 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		WindowManager.addWindow(TextWindow.this);
 		org.eclipse.swt.graphics.Point loc = null;
 		int w = 0, h = 0;
-		if (title.equals("Results")) {
+		if(title.equals("Results")) {
 			loc = Prefs.getLocation(LOC_KEY, null);
-			w = (int) Prefs.get(WIDTH_KEY, 0.0);
-			h = (int) Prefs.get(HEIGHT_KEY, 0.0);
-		} else if (title.equals("Log")) {
+			w = (int)Prefs.get(WIDTH_KEY, 0.0);
+			h = (int)Prefs.get(HEIGHT_KEY, 0.0);
+		} else if(title.equals("Log")) {
 			loc = Prefs.getLocation(LOG_LOC_KEY, null);
-			w = (int) Prefs.get(LOG_WIDTH_KEY, 0.0);
-			h = (int) Prefs.get(LOG_HEIGHT_KEY, 0.0);
-		} else if (title.equals("Debug")) {
+			w = (int)Prefs.get(LOG_WIDTH_KEY, 0.0);
+			h = (int)Prefs.get(LOG_HEIGHT_KEY, 0.0);
+		} else if(title.equals("Debug")) {
 			loc = Prefs.getLocation(DEBUG_LOC_KEY, null);
 			w = width;
 			h = height;
 		}
-		if (loc != null && w > 0 && h > 0) {
+		if(loc != null && w > 0 && h > 0) {
 			shell.setSize(w, h);
 			shell.setLocation(loc);
 		} else {
 			shell.setSize(width, height);
-			if (!IJ.debugMode)
+			if(!IJ.debugMode)
 				GUI.centerOnImageJScreen(shell);
 		}
 		shell.setVisible(true);
@@ -191,9 +201,12 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	/**
 	 * Opens a new text window containing the contents of a text file.
 	 * 
-	 * @param path   the path to the text file
-	 * @param width  the width of the window in pixels
-	 * @param height the height of the window in pixels
+	 * @param path
+	 *            the path to the text file
+	 * @param width
+	 *            the width of the window in pixels
+	 * @param height
+	 *            the height of the window in pixels
 	 */
 	public TextWindow(String path, int width, int height) {
 
@@ -206,7 +219,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		/* Changed for SWT */
 		textPanel.addKeyListener(IJ.getInstance());
 		// add("Center", textPanel);
-		if (openFile(path)) {
+		if(openFile(path)) {
 			// Changed for SWT!
 			WindowManager.addWindow(this);
 			shell.setSize(width, height);
@@ -219,7 +232,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	void addMenuBar() {
 
 		mb = new org.eclipse.swt.widgets.Menu(shell, SWT.BAR);
-		if (Menus.getFontSize() != 0) {
+		if(Menus.getFontSize() != 0) {
 			/* Necessary for SWT? */
 			// mb.setFont(Menus.getFont());
 		}
@@ -232,7 +245,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		mit.setText("Save As...");
 		mit.setAccelerator('s');
 		mit.addSelectionListener(this);
-		if (isResultsTable) {
+		if(isResultsTable) {
 			org.eclipse.swt.widgets.MenuItem renameItem = new org.eclipse.swt.widgets.MenuItem(filemenu, SWT.PUSH);
 			renameItem.setText("Rename...");
 			renameItem.addSelectionListener(this);
@@ -320,29 +333,25 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		// m.add(new org.eclipse.swt.widgets.MenuItem("Save Settings"));
 		font.addSelectionListener(this);
 		// mb.add(m);
-		if (isResultsTable) {
+		if(isResultsTable) {
 			// m = new Menu("Results");
 			org.eclipse.swt.widgets.MenuItem results = new org.eclipse.swt.widgets.MenuItem(mb, SWT.CASCADE);
 			results.setText("Results");
 			final org.eclipse.swt.widgets.Menu resultsmenu = new org.eclipse.swt.widgets.Menu(shell, SWT.DROP_DOWN);
 			results.setMenu(resultsmenu);
 			results.addSelectionListener(this);
-			org.eclipse.swt.widgets.MenuItem clearResultsItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu,
-					SWT.PUSH);
+			org.eclipse.swt.widgets.MenuItem clearResultsItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu, SWT.PUSH);
 			clearResultsItem.setText("Clear Results");
 			clearResultsItem.addSelectionListener(this);
 			// m.add(new org.eclipse.swt.widgets.MenuItem("Clear Results"));
-			org.eclipse.swt.widgets.MenuItem summarizeItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu,
-					SWT.PUSH);
+			org.eclipse.swt.widgets.MenuItem summarizeItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu, SWT.PUSH);
 			summarizeItem.setText("Summarize");
 			summarizeItem.addSelectionListener(this);
 			// m.add(new org.eclipse.swt.widgets.MenuItem("Distribution..."));
-			org.eclipse.swt.widgets.MenuItem distributionItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu,
-					SWT.PUSH);
+			org.eclipse.swt.widgets.MenuItem distributionItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu, SWT.PUSH);
 			distributionItem.setText("Distribution...");
 			distributionItem.addSelectionListener(this);
-			org.eclipse.swt.widgets.MenuItem setMeasurementItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu,
-					SWT.PUSH);
+			org.eclipse.swt.widgets.MenuItem setMeasurementItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu, SWT.PUSH);
 			setMeasurementItem.setText("Set Measurements...");
 			setMeasurementItem.addSelectionListener(this);
 			org.eclipse.swt.widgets.MenuItem sortItem = new org.eclipse.swt.widgets.MenuItem(resultsmenu, SWT.PUSH);
@@ -363,8 +372,9 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	/**
 	 * Adds one or more lines of text to the window.
 	 * 
-	 * @param text The text to be appended. Multiple lines should be separated by
-	 *             \n.
+	 * @param text
+	 *            The text to be appended. Multiple lines should be separated by
+	 *            \n.
 	 */
 	public void append(String text) {
 
@@ -373,11 +383,10 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 
 	void setFont() {
 
-		if (font != null)
+		if(font != null)
 			textPanel.setFont(font, antialiasedButton.getSelection());
 		else {
-			font = new org.eclipse.swt.graphics.Font(Display.getDefault(),
-					new FontData("SansSerif", sizes[fontSize], SWT.NORMAL));
+			font = new org.eclipse.swt.graphics.Font(Display.getDefault(), new FontData(getFontName(), sizes[fontSize], SWT.NORMAL));
 			textPanel.setFont(font, antialiasedButton.getSelection());
 		}
 	}
@@ -392,7 +401,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		OpenDialog od = new OpenDialog("Open Text File...", path);
 		String directory = od.getDirectory();
 		String name = od.getFileName();
-		if (name == null)
+		if(name == null)
 			return false;
 		path = directory + name;
 		IJ.showStatus("Opening: " + path);
@@ -400,7 +409,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 			BufferedReader r = new BufferedReader(new FileReader(directory + name));
 			load(r);
 			r.close();
-		} catch (Exception e) {
+		} catch(Exception e) {
 			IJ.error(e.getMessage());
 			return true;
 		}
@@ -426,9 +435,9 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	public void load(BufferedReader in) throws IOException {
 
 		int count = 0;
-		while (true) {
+		while(true) {
 			String s = in.readLine();
-			if (s == null)
+			if(s == null)
 				break;
 			textPanel.appendLine(s);
 		}
@@ -438,8 +447,8 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	public void widgetSelected(SelectionEvent e) {
 
 		// System.out.println(e);
-		String cmd = ((org.eclipse.swt.widgets.MenuItem) e.widget).getText();
-		if (cmd.equals("Antialiased")) {
+		String cmd = ((org.eclipse.swt.widgets.MenuItem)e.widget).getText();
+		if(cmd.equals("Antialiased")) {
 			itemStateChanged(e);
 		} else {
 			actionPerformed(e);
@@ -448,12 +457,12 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 
 	public void actionPerformed(SelectionEvent evt) {
 
-		String cmd = ((org.eclipse.swt.widgets.MenuItem) evt.widget).getText();
-		if (cmd.equals("Make Text Larger"))
+		String cmd = ((org.eclipse.swt.widgets.MenuItem)evt.widget).getText();
+		if(cmd.equals("Make Text Larger"))
 			changeFontSize(true);
-		else if (cmd.equals("Make Text Smaller"))
+		else if(cmd.equals("Make Text Smaller"))
 			changeFontSize(false);
-		else if (cmd.equals("Save Settings"))
+		else if(cmd.equals("Save Settings"))
 			saveSettings();
 		else
 			textPanel.doCommand(cmd);
@@ -469,9 +478,9 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 
 		font = null;
 		setFont();
-		if (IJ.recording()) {
+		if(IJ.recording()) {
 			boolean state = monospacedButton.getSelection();
-			if (Recorder.scriptMode())
+			if(Recorder.scriptMode())
 				Recorder.recordCall("TextWindow.setMonospaced(" + state + ");");
 			else
 				Recorder.recordString("setOption(\"MonospacedText\", " + state + ");\n");
@@ -502,8 +511,8 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 		Display.getDefault().syncExec(() -> {
 			textPanel.defaultCursor.dispose();
 			textPanel.resizeCursor.dispose();
-			if (shell.getText().equals("Results")) {
-				if (showDialog && !Analyzer.resetCounter()) {
+			if(shell.getText().equals("Results")) {
+				if(showDialog && !Analyzer.resetCounter()) {
 					okayToClose = false;
 					return;
 				}
@@ -512,7 +521,7 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 				org.eclipse.swt.graphics.Point d = shell.getSize();
 				Prefs.set(WIDTH_KEY, d.x);
 				Prefs.set(HEIGHT_KEY, d.y);
-			} else if (shell.getText().equals("Log")) {
+			} else if(shell.getText().equals("Log")) {
 				Prefs.saveLocation(LOG_LOC_KEY, shell.getLocation());
 				org.eclipse.swt.graphics.Point d = shell.getSize();
 				Prefs.set(LOG_WIDTH_KEY, d.x);
@@ -520,10 +529,10 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 				IJ.setDebugMode(false);
 				IJ.log("\\Closed");
 				IJ.notifyEventListeners(IJEventListener.LOG_WINDOW_CLOSED);
-			} else if (shell.getText().equals("Debug")) {
+			} else if(shell.getText().equals("Debug")) {
 				Prefs.saveLocation(DEBUG_LOC_KEY, shell.getLocation());
-			} else if (textPanel != null && textPanel.rt != null) {
-				if (!saveContents()) {
+			} else if(textPanel != null && textPanel.rt != null) {
+				if(!saveContents()) {
 					okayToClose = false;
 					return;
 				}
@@ -533,7 +542,6 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 			WindowManager.removeWindow(TextWindow.this);
 			shell.dispose();
 			textPanel.flush();
-
 		});
 	}
 
@@ -545,17 +553,17 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	boolean saveContents() {
 
 		int lineCount = textPanel.getLineCount();
-		if (!textPanel.unsavedLines)
+		if(!textPanel.unsavedLines)
 			lineCount = 0;
 		ImageJ ij = IJ.getInstance();
 		boolean macro = IJ.macroRunning() || Interpreter.isBatchMode();
 		boolean isResults = shell.getText().contains("Results");
-		if (lineCount > 0 && !macro && ij != null && !ij.quitting() && isResults) {
+		if(lineCount > 0 && !macro && ij != null && !ij.quitting() && isResults) {
 			YesNoCancelDialog d = new YesNoCancelDialog(shell.getText(), "Save " + lineCount + " measurements?");
-			if (d.cancelPressed())
+			if(d.cancelPressed())
 				return false;
-			else if (d.yesPressed()) {
-				if (!textPanel.saveAs(""))
+			else if(d.yesPressed()) {
+				if(!textPanel.saveAs(""))
 					return false;
 			}
 		}
@@ -566,13 +574,13 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	void changeFontSize(boolean larger) {
 
 		int in = fontSize;
-		if (larger) {
+		if(larger) {
 			fontSize++;
-			if (fontSize == sizes.length)
+			if(fontSize == sizes.length)
 				fontSize = sizes.length - 1;
 		} else {
 			fontSize--;
-			if (fontSize < 0)
+			if(fontSize < 0)
 				fontSize = 0;
 		}
 		IJ.showStatus(sizes[fontSize] + " point");
@@ -585,17 +593,17 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 
 		font = new org.eclipse.swt.graphics.Font(Display.getDefault(), new FontData(name, size, style));
 		Object log = WindowManager.getWindow("Log");
-		if (log != null && (log instanceof TextWindow))
-			((TextWindow) log).setFont();
+		if(log != null && (log instanceof TextWindow))
+			((TextWindow)log).setFont();
 	}
 
 	public static void setMonospaced(boolean b) {
 
 		monospaced = b;
 		Object log = WindowManager.getWindow("Log");
-		if (log != null && (log instanceof TextWindow)) {
-			((TextWindow) log).monospacedButton.setSelection(monospaced);
-			((TextWindow) log).setFont();
+		if(log != null && (log instanceof TextWindow)) {
+			((TextWindow)log).monospacedButton.setSelection(monospaced);
+			((TextWindow)log).setFont();
 		}
 	}
 
@@ -632,19 +640,20 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	@Override
 	public void shellActivated(ShellEvent arg0) {
 
-		if (!"Log".equals(shell.getText()))
+		if(!"Log".equals(shell.getText()))
 			WindowManager.setWindow(this);
 	}
 
 	@Override
 	public void shellClosed(ShellEvent e) {
+
 		e.doit = false;
 		close();
 		/*
 		 * If we cancel (okayToClose==false) the dialog we have to prevent the shell
 		 * closing!
 		 */
-		if (okayToClose) {
+		if(okayToClose) {
 			e.doit = true;
 		}
 	}
