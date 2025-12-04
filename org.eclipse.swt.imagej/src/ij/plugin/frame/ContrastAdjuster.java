@@ -90,8 +90,8 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 	boolean windowLevel, balance;
 	org.eclipse.swt.graphics.Font monoFont = new org.eclipse.swt.graphics.Font(Display.getDefault(),
 			new FontData("Monospaced", 8, SWT.NORMAL));
-	// new Font("Monospaced", Font.PLAIN, 11);
-	org.eclipse.swt.graphics.Font sanFont = IJ.font12Swt;
+	
+	org.eclipse.swt.graphics.Font sanFont = IJ.font10;
 	int channels = 7; // RGB
 	org.eclipse.swt.widgets.Combo choice;
 	org.eclipse.swt.widgets.Button logHistCheckbox;
@@ -139,60 +139,41 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			IJ.register(ContrastAdjuster.class);
 			WindowManager.addWindow(ContrastAdjuster.this);
 			ij = IJ.getInstance();
-			/*
-			 * gridbag = new GridBagLayout(); c = new GridBagConstraints();
-			 */
+
 			shell.setLayout(new org.eclipse.swt.layout.GridLayout(1, true));
-			/*
-			 * if (scale>1.0) { sanFont =
-			 * sanFont.deriveFont((float)(sanFont.getSize()*scale)); monoFont =
-			 * monoFont.deriveFont((float)(monoFont.getSize()*scale)); }
-			 */
-			// plot
-			// c.gridx = 0;
-			/*
-			 * y = 0; c.gridy = y++; c.fill = GridBagConstraints.BOTH; c.anchor =
-			 * GridBagConstraints.CENTER; c.insets = new Insets(10, 10, 0, 10);
-			 * gridbag.setConstraints(plot, c);
-			 */
+
 			plot = new ContrastPlot(shell);
-			plot.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+			plot.setLayoutData(layoutData);
 			// add(plot);
 			plot.addKeyListener(ij);
 			// min and max labels
 			if (!windowLevel) {
 				panel = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
-				panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-				/*
-				 * c.gridy = y++; c.insets = new Insets(0, 10, 0, 10);
-				 */
-				// gridbag.setConstraints(panel, c);
-				// panel.setLayout(new ij.layout.BorderLayout());
+				panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
 				panel.setLayout(new org.eclipse.swt.layout.GridLayout(2, true));
 
 				minLabel = new org.eclipse.swt.widgets.Label(panel, SWT.NONE);
-				minLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				minLabel.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false, 1, 1));
 				// minLabel.setLayoutData("WEST");
 				minLabel.setText(blankLabel8);
 				minLabel.setFont(monoFont);
 				if (IJ.debugMode)
 					minLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_YELLOW));
-				// panel.add("West", minLabel);
+
 				maxLabel = new org.eclipse.swt.widgets.Label(panel, SWT.NONE);
-				maxLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				maxLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, true, false, 1, 1));
 				maxLabel.setFont(monoFont);
 				maxLabel.setText(blankLabel8);
-				// maxLabel.setLayoutData("EAST");
+
 				if (IJ.debugMode)
 					maxLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_YELLOW));
-				// maxLabel.setLayoutData("East");
-				// panel.add("East", maxLabel);
-				// add(panel);
+
 				blankLabel8 = "        ";
 			}
-			logHistCheckbox = new org.eclipse.swt.widgets.Button(panel, SWT.CHECK);
-			logHistCheckbox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			logHistCheckbox = new org.eclipse.swt.widgets.Button(shell, SWT.CHECK);
+			logHistCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false, 1, 1));
 			logHistCheckbox.setSelection(isLogHist);
 			logHistCheckbox.setText("Log scale");
 			logHistCheckbox.addSelectionListener(ContrastAdjuster.this);
@@ -200,52 +181,36 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			// min slider
 			if (!windowLevel) {
 				minSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
-				minSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				minSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 				minSlider.setValues(sliderRange / 2, 0, sliderRange, 1, 1, 1);
-				// GUI.fixScrollbar(minSlider);
-				/*
-				 * c.gridy = y++; c.insets = new Insets(2, 10, 0, 10);
-				 * gridbag.setConstraints(minSlider, c); add(minSlider);
-				 */
+
 				minSlider.addSelectionListener(ContrastAdjuster.this);
 				minSlider.addKeyListener(ij);
-				/*
-				 * minSlider.setUnitIncrement(1); minSlider.setFocusable(false); // prevents
-				 * blinking on Windows
-				 */
+
 				addLabel("Minimum", null);
 			}
 			// max slider
 			if (!windowLevel) {
 				maxSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
-				maxSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				maxSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 				maxSlider.setValues(sliderRange / 2, 0, sliderRange, 1, 1, 1);
-				// GUI.fixScrollbar(maxSlider);
-				// c.gridy = y++;
-				// c.insets = new Insets(2, 10, 0, 10);
-				// gridbag.setConstraints(maxSlider, c);
-				// add(maxSlider);
+
 				maxSlider.addSelectionListener(ContrastAdjuster.this);
 				maxSlider.addKeyListener(ij);
-				// maxSlider.setUnitIncrement(1);
-				// maxSlider.setFocusable(false);
+
 				addLabel("Maximum", null);
 			}
 			// brightness slider
 			brightnessSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
-			brightnessSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			brightnessSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			brightnessSlider.setValues(sliderRange / 2, 0, sliderRange, 1, 1, 1);
-			// GUI.fixScrollbar(brightnessSlider);
-			// c.gridy = y++;
-			// c.insets = new Insets(windowLevel?12:2, 10, 0, 10);
-			// gridbag.setConstraints(brightnessSlider, c);
-			// add(brightnessSlider);
+
 			brightnessSlider.addSelectionListener(ContrastAdjuster.this);
 			brightnessSlider.addKeyListener(ij);
-			// brightnessSlider.setUnitIncrement(1);
+
 			if (windowLevel) {
 				org.eclipse.swt.widgets.Label label = new org.eclipse.swt.widgets.Label(shell, SWT.NONE);
-				label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				label.setLayoutData(layoutData);
 				label.setText(blankLabel12);
 				addLabel("Level: ", levelLabel = label);
 			} else
@@ -253,21 +218,15 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			// contrast slider
 			if (!balance) {
 				contrastSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
-				contrastSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				contrastSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 				contrastSlider.setValues(sliderRange / 2, 0, sliderRange, 1, 1, 1);
-				// Scrollbar.HORIZONTAL, sliderRange/2, 1, 0, sliderRange
-				// GUI.fixScrollbar(contrastSlider);
-				/*
-				 * c.gridy = y++; c.insets = new Insets(2, 10, 0, 10);
-				 * gridbag.setConstraints(contrastSlider, c); add(contrastSlider);
-				 */
+
 				contrastSlider.addSelectionListener(ContrastAdjuster.this);
 				contrastSlider.addKeyListener(ij);
-				// contrastSlider.setUnitIncrement(1);
-				// contrastSlider.setFocusable(false);
+
 				if (windowLevel) {
 					windowLabel = new org.eclipse.swt.widgets.Label(shell, SWT.NONE);
-					windowLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+					windowLabel.setLayoutData(layoutData);
 					windowLabel.setText(blankLabel12);
 					addLabel("Window: ", windowLabel);
 				} else
@@ -275,53 +234,40 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			}
 			// color channel popup menu
 			if (balance) {
-				/*
-				 * c.gridy = y++; c.insets = new Insets(5, 10, 0, 10);
-				 */
+
 				choice = new org.eclipse.swt.widgets.Combo(shell, SWT.DROP_DOWN | SWT.READ_ONLY);
+				choice.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 				addBalanceChoices();
-				// gridbag.setConstraints(choice, c);
+
 				choice.addSelectionListener(ContrastAdjuster.this);
-				// add(choice);
+
 			}
-			// buttons
-			/*
-			 * if (scale>1.0) { Font font = getFont(); if (font!=null) font =
-			 * font.deriveFont((float)(font.getSize()*scale)); else font = new
-			 * Font("SansSerif", Font.PLAIN, (int)(12*scale)); setFont(font); }
-			 */
+
 			int trim = IJ.isMacOSX() ? 20 : 0;
 			panel = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
+			panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			panel.setLayout(new org.eclipse.swt.layout.GridLayout(2, true));
 			autoB = new org.eclipse.swt.widgets.Button(panel, SWT.NONE);
-			autoB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			autoB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			autoB.setText("Auto");
 			autoB.addSelectionListener(ContrastAdjuster.this);
 			autoB.addKeyListener(ij);
-			// panel.add(autoB);
 			resetB = new org.eclipse.swt.widgets.Button(panel, SWT.NONE);
-			resetB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			resetB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			resetB.setText("Reset");
 			resetB.addSelectionListener(ContrastAdjuster.this);
 			resetB.addKeyListener(ij);
-			// panel.add(resetB);
 			setB = new org.eclipse.swt.widgets.Button(panel, SWT.NONE);
-			setB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			setB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			setB.setText("Set");
 			setB.addSelectionListener(ContrastAdjuster.this);
 			setB.addKeyListener(ij);
-			// panel.add(setB);
 			applyB = new org.eclipse.swt.widgets.Button(panel, SWT.NONE);
-			applyB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			applyB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			applyB.setText("Apply");
 			applyB.addSelectionListener(ContrastAdjuster.this);
 			applyB.addKeyListener(ij);
-			// panel.add(applyB);
-			/*
-			 * c.gridy = y++; c.insets = new Insets(8, 5, 10, 5);
-			 * gridbag.setConstraints(panel, c);
-			 */
-			// add(panel);
+
 			shell.addKeyListener(ij); // ImageJ handles keyboard shortcuts
 			shell.layout();
 			Point loc = Prefs.getLocation(LOC_KEY);
@@ -329,7 +275,8 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 				shell.setLocation(loc.x, loc.y);
 			else
 				GUI.centerOnImageJScreen(shell);
-			// if (IJ.isMacOSX()) setResizable(false);
+
+			shell.setSize(200, 500);
 			shell.pack();
 			shell.setVisible(true);
 
@@ -366,25 +313,17 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 
 		if (label2 == null && IJ.isMacOSX())
 			text += "    ";
-		// panel = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
-		/*
-		 * c.gridy = y++; int bottomInset = IJ.isMacOSX()?4:0; c.insets = new Insets(0,
-		 * 10, bottomInset, 0); gridbag.setConstraints(panel, c);
-		 */
-		// panel.setLayout(new ij.layout.FlowLayout(label2 == null ? FlowLayout.CENTER :
-		// FlowLayout.LEFT, 0, 0));
+
 		org.eclipse.swt.widgets.Label label = new org.eclipse.swt.widgets.Label(shell, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true, 1, 1));
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, true, 1, 1));
 		label.setFont(sanFont);
 		label.setText(text);
-		// panel.add(label);
 		if (label2 != null) {
 			label2.setFont(monoFont);
 			label2.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, true, 1, 1));
 			label2.setText(text);
-			// panel.add(label2);
 		}
-		// add(panel);
+
 	}
 
 	void setup() {
@@ -1563,7 +1502,7 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 		 * if (scale > 1.0) { width = (int) (width * scale); height = (int) (height *
 		 * scale); }
 		 */
-		setSize(width + 1, height + 1);
+		// setSize(width + 1, height + 1);
 	}
 
 	/**
@@ -1573,6 +1512,13 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas
 	public Dimension getPreferredSize() {
 
 		return new Dimension(width + 1, height + 1);
+	}
+
+	public org.eclipse.swt.graphics.Point computeSize(int widthHint, int heightHint, boolean changed) {
+		org.eclipse.swt.graphics.Point size = super.computeSize(widthHint, heightHint, changed);
+		size.x = width + 2;
+		size.y = height + 20;
+		return size;
 	}
 
 	void setHistogram(ImageStatistics stats, boolean isLogHist) {

@@ -141,52 +141,17 @@ public class ThresholdAdjuster extends PlugInDialog
 			IJ.register(PasteController.class);
 
 			ij = IJ.getInstance();
-			// Font font = IJ.font12;
+
 			org.eclipse.swt.graphics.Font font = IJ.font12Swt;
-			/*
-			 * GridBagLayout gridbag = new GridBagLayout(); GridBagConstraints c = new
-			 * GridBagConstraints(); setLayout(gridbag);
-			 */
 
 			shell.setLayout(new org.eclipse.swt.layout.GridLayout(1, true));
 
-			// plot
-			/*
-			 * int y = 0; c.gridx = 0; c.gridy = y++; c.gridwidth = 2; c.fill =
-			 * GridBagConstraints.BOTH; c.anchor = GridBagConstraints.CENTER; c.insets = new
-			 * Insets(10, 10, 0, 10); //top left bottom right
-			 */
 			plot = new ThresholdPlot(shell);
 			plot.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			// add(plot, c);
-			/* To do after port to SWT */
-			// plot.addKeyListener(ij);
-
-			// percentiles
-			/*
-			 * c.gridx = 0; c.gridy = y++; c.insets = new Insets(1, 10, 0, 10);
-			 */
 
 			percentiles = new org.eclipse.swt.widgets.Label(shell, SWT.NONE);
 			percentiles.setText("");
 			percentiles.setFont(font);
-			// add(percentiles, c);
-
-			// minThreshold slider
-			// minSlider = new Scrollbar(Scrollbar.HORIZONTAL, sliderRange/3, 1, 0,
-			// sliderRange);
-			// GUI.fixScrollbar(minSlider);
-			/*
-			 * c.gridx = 0; c.gridy = y++; c.gridwidth = 1; c.weightx =
-			 * IJ.isMacintosh()?90:100; c.fill = GridBagConstraints.HORIZONTAL; c.insets =
-			 * new Insets(1, 10, 0, 0);
-			 */
-			// add(minSlider, c);
-			// minSlider.addAdjustmentListener(this);
-			// minSlider.addMouseWheelListener(this);
-//		minSlider.addKeyListener(ij);
-			// minSlider.setUnitIncrement(1);
-			// minSlider.setFocusable(false);
 
 			minSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
 			minSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -194,36 +159,16 @@ public class ThresholdAdjuster extends PlugInDialog
 			minSlider.addSelectionListener(ThresholdAdjuster.this);
 			minSlider.addMouseWheelListener(ThresholdAdjuster.this);
 			minSlider.addKeyListener(ij);
-			// addLabel("Minimum", null);
 
-			// minThreshold slider label
-			/*
-			 * c.gridx = 1; c.gridwidth = 1; c.weightx = IJ.isMacintosh()?10:0; c.insets =
-			 * new Insets(5, 0, 0, 10);
-			 */
 			String text = "000000";
 			int columns = 4;
 			minLabel = new org.eclipse.swt.widgets.Text(shell, SWT.SINGLE);
 			minLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1));
 			minLabel.setText(text);
-			// minLabel.setFont(font);
-			// add(minLabel, c);
+
 			minLabel.addFocusListener(ThresholdAdjuster.this);
 			minLabel.addMouseWheelListener(ThresholdAdjuster.this);
 			minLabel.addKeyListener(ThresholdAdjuster.this);
-
-			// maxThreshold slider
-			// maxSlider = new Scrollbar(Scrollbar.HORIZONTAL, sliderRange*2/3, 1, 0,
-			// sliderRange);
-			/*
-			 * GUI.fixScrollbar(maxSlider); c.gridx = 0; c.gridy = y++; c.gridwidth = 1;
-			 * c.weightx = 100; c.insets = new Insets(2, 10, 0, 0); add(maxSlider, c);
-			 */
-			// maxSlider.addAdjustmentListener(this);
-			// maxSlider.addMouseWheelListener(this);
-//		maxSlider.addKeyListener(ij);
-			// maxSlider.setUnitIncrement(1);
-			// maxSlider.setFocusable(false);
 
 			maxSlider = new org.eclipse.swt.widgets.Slider(shell, SWT.HORIZONTAL);
 			maxSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -232,32 +177,17 @@ public class ThresholdAdjuster extends PlugInDialog
 			maxSlider.addMouseWheelListener(ThresholdAdjuster.this);
 			maxSlider.addKeyListener(ij);
 
-			// maxThreshold slider label
-			/*
-			 * c.gridx = 1; c.gridwidth = 1; c.weightx = 0; c.insets = new Insets(2, 0, 0,
-			 * 10);
-			 */
-			/*
-			 * maxLabel = new TextField(text,columns); maxLabel.setFont(font); add(maxLabel,
-			 * c); maxLabel.addFocusListener(this); maxLabel.addMouseWheelListener(this);
-			 * maxLabel.addKeyListener(this);
-			 */
-
 			maxLabel = new org.eclipse.swt.widgets.Text(shell, SWT.SINGLE);
 			maxLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1));
 			maxLabel.setText(text);
-			// maxLabel.setFont(font);
-			// add(minLabel, c);
+
 			maxLabel.addFocusListener(ThresholdAdjuster.this);
 			maxLabel.addMouseWheelListener(ThresholdAdjuster.this);
 			maxLabel.addKeyListener(ThresholdAdjuster.this);
 
-			// choices
-			// panel = new Panel();
 			org.eclipse.swt.widgets.Composite panel2 = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
 			panel2.setLayout(new org.eclipse.swt.layout.GridLayout(2, true));
 			panel2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			// methodChoice = new Choice();
 			int selIndex = 0;
 			methodChoice = new org.eclipse.swt.widgets.Combo(panel2, SWT.DROP_DOWN | SWT.READ_ONLY);
 			methodChoice.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -270,37 +200,22 @@ public class ThresholdAdjuster extends PlugInDialog
 
 			methodChoice.select(selIndex);
 			methodChoice.addSelectionListener(ThresholdAdjuster.this);
-			// methodChoice.addKeyListener(ij);
-			// panel.add(methodChoice);
-			// modeChoice = new Choice();
+
 			modeChoice = new org.eclipse.swt.widgets.Combo(panel2, SWT.DROP_DOWN | SWT.READ_ONLY);
 			modeChoice.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			for (int i = 0; i < modes.length; i++)
 				modeChoice.add(modes[i]);
 			modeChoice.select(mode);
 			modeChoice.addSelectionListener(ThresholdAdjuster.this);
-			// modeChoice.addKeyListener(ij);
-			// panel.add(modeChoice);
-			/*
-			 * c.gridx = 0; c.gridy = y++; c.gridwidth = 2; c.insets = new Insets(8, 5, 0,
-			 * 5); c.anchor = GridBagConstraints.CENTER; c.fill = GridBagConstraints.NONE;
-			 * add(panel, c);
-			 */
 
-			// checkboxes
-			// panel = new Panel();
 			org.eclipse.swt.widgets.Composite panel3 = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
 			panel3.setLayout(new org.eclipse.swt.layout.GridLayout(2, true));
-			// panel.setLayout(new GridLayout(2, 2));
 			boolean db = Prefs.get(DARK_BACKGROUND, Prefs.blackBackground ? true : false);
-			// darkBackground = new Checkbox("Dark background");
 			darkBackgroundCheckbox = new org.eclipse.swt.widgets.Button(panel3, SWT.CHECK);
 			darkBackgroundCheckbox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			darkBackgroundCheckbox.setText("Dark background");
 			darkBackgroundCheckbox.setSelection(db);
 			darkBackgroundCheckbox.addSelectionListener(ThresholdAdjuster.this);
-			// panel.add(darkBackground);
-			// stackHistogram = new Checkbox("Stack histogram");
 
 			stackCheckbox = new org.eclipse.swt.widgets.Button(panel3, SWT.CHECK);
 			stackCheckbox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -331,64 +246,36 @@ public class ThresholdAdjuster extends PlugInDialog
 			rawValues.setSelection(Prefs.get(RAW_VALUES, false));
 			rawValues.addSelectionListener(ThresholdAdjuster.this);
 
-			// panel.add(stackHistogram);
-			// noReset = Prefs.get(NO_RESET, false);
-			// noResetButton = new Checkbox("Don't reset range");
-
-			// panel.add(noResetButton);
-			/*
-			 * c.gridx = 0; c.gridy = y++; c.gridwidth = 2; c.insets = new Insets(5, 5, 0,
-			 * 0); add(panel, c);
-			 */
-
-			// buttons
 			int trim = IJ.isMacOSX() ? 11 : 0;
-			// panel = new Panel();
+
 			org.eclipse.swt.widgets.Composite panel4 = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
 			panel4.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			panel4.setLayout(new org.eclipse.swt.layout.GridLayout(2, true));
-			// int hgap = IJ.isMacOSX()?1:5;
-			// panel.setLayout(new FlowLayout(FlowLayout.RIGHT,hgap,0));
-			// autoB = new TrimmedButton("Auto",trim);
+
 			autoB = new org.eclipse.swt.widgets.Button(panel4, SWT.NONE);
 			autoB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			autoB.setText("Auto");
 			autoB.addSelectionListener(ThresholdAdjuster.this);
 			autoB.addKeyListener(ij);
-			// panel.add(autoB);
-			// applyB = new TrimmedButton("Apply",trim);
-			// applyB.addActionListener(this);
+
 			applyB = new org.eclipse.swt.widgets.Button(panel4, SWT.NONE);
 			applyB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			applyB.setText("Apply");
 			applyB.addSelectionListener(ThresholdAdjuster.this);
 			applyB.addKeyListener(ij);
-			// panel.add(applyB);
-			// resetB = new TrimmedButton("Reset",trim);
-			// resetB.addActionListener(this);
 
 			resetB = new org.eclipse.swt.widgets.Button(panel4, SWT.NONE);
 			resetB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			resetB.setText("Reset");
 			resetB.addSelectionListener(ThresholdAdjuster.this);
 			resetB.addKeyListener(ij);
-			// panel.add(resetB);
 
-			// setB = new TrimmedButton("Set",trim);
-			// setB.addActionListener(this);
 			setB = new org.eclipse.swt.widgets.Button(panel4, SWT.NONE);
 			setB.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 			setB.setText("Set");
 			setB.addSelectionListener(ThresholdAdjuster.this);
 			setB.addKeyListener(ij);
-			// panel.add(setB);
-			/*
-			 * c.gridx = 0; c.gridy = y++; c.gridwidth = 2; c.insets = new Insets(0, 5, 10,
-			 * 5); add(panel, c);
-			 */
-			/* To do after port to SWT */
-			// addKeyListener(ij); // ImageJ handles keyboard shortcuts
-			// GUI.scale(this);
+
 			shell.layout(true);
 			shell.pack();
 			Point loc = Prefs.getLocation(LOC_KEY);
@@ -1366,6 +1253,13 @@ class ThresholdPlot extends org.eclipse.swt.widgets.Canvas
 	 */
 	public Dimension getPreferredSize() {
 		return new Dimension(width + 2, height + 2);
+	}
+
+	public org.eclipse.swt.graphics.Point computeSize(int widthHint, int heightHint, boolean changed) {
+		org.eclipse.swt.graphics.Point size = super.computeSize(widthHint, heightHint, changed);
+		size.x = width + 2;
+		size.y = height + 20;
+		return size;
 	}
 
 	ImageStatistics setHistogram(ImagePlus imp, boolean entireStack, boolean rawValues) {
