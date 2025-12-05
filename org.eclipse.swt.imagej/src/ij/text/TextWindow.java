@@ -211,22 +211,24 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	public TextWindow(String path, int width, int height) {
 
 		// super("");
-		shell = new Shell(Display.getDefault(), SWT.NORMAL);
-		shell.setLayout(new FillLayout());
-		shell.setText("");
-		// enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-		textPanel = new TextPanel(this, shell);
-		/* Changed for SWT */
-		textPanel.addKeyListener(IJ.getInstance());
-		// add("Center", textPanel);
-		if(openFile(path)) {
-			// Changed for SWT!
-			WindowManager.addWindow(this);
-			shell.setSize(width, height);
-			shell.setVisible(true);
-			WindowManager.setWindow(this);
-		} else
-			close();
+		Display.getDefault().syncExec(() -> {
+			shell = new Shell(Display.getDefault(), SWT.NORMAL);
+			shell.setLayout(new FillLayout());
+			shell.setText("");
+			// enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+			textPanel = new TextPanel(this, shell);
+			/* Changed for SWT */
+			textPanel.addKeyListener(IJ.getInstance());
+			// add("Center", textPanel);
+			if(openFile(path)) {
+				// Changed for SWT!
+				WindowManager.addWindow(this);
+				shell.setSize(width, height);
+				shell.setVisible(true);
+				WindowManager.setWindow(this);
+			} else
+				close();
+		});
 	}
 
 	void addMenuBar() {

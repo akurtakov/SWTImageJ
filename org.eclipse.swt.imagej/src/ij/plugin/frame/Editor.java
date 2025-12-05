@@ -748,10 +748,14 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 
 	public String getText() {
 
-		if(ta == null)
-			return "";
-		else
-			return ta.getText();
+		AtomicReference<String> fileRef = new AtomicReference<String>();
+		Display.getDefault().syncExec(() -> {
+			if(ta == null)
+				fileRef.set("");
+			else
+				fileRef.set(ta.getText());
+		});
+		return fileRef.get();
 	}
 
 	public StyledText getTextArea() {
