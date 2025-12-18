@@ -271,18 +271,13 @@ public class FloatProcessor extends ImageProcessor {
 		if (imageSwt==null || cm!=cm2) {
 			if (cm==null) cm = getDefaultColorModel();
 			IndexColorModel colorModel = (IndexColorModel)cm;
-			  int size = colorModel.getMapSize();
-	          byte[] reds = new byte[size];
-	          byte[] greens = new byte[size];
-	          byte[] blues = new byte[size];
-	          colorModel.getReds(reds);
-	          colorModel.getGreens(greens);
-	          colorModel.getBlues(blues);
-	          RGB[] rgbs = new RGB[size];
-	          for (int i = 0; i < rgbs.length; i++) {
-	              rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF,
-	                      blues[i] & 0xFF);
-	          }
+			int size = colorModel.getMapSize();
+			RGB[] rgbs = new RGB[size];
+			for (int i = 0; i < size; i++) {
+			    rgbs[i] = new RGB(colorModel.getRed(i) & 0xFF,
+			                  colorModel.getGreen(i) & 0xFF,
+			                  colorModel.getBlue(i) & 0xFF);
+			}
 	          PaletteData palette = new PaletteData(rgbs);
 	          ImageData data = new ImageData(getWidth(),
 	                  getHeight(), colorModel.getPixelSize(),
