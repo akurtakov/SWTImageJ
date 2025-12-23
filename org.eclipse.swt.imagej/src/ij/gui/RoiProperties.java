@@ -48,7 +48,8 @@ public class RoiProperties implements ModifyListener, ShellListener {
 	private Text groupField, colorField;
 	private org.eclipse.swt.widgets.Label groupName;
 
-	/** Constructs a RoiProperties using the specified title for a given image and roi;
+	/**
+	 * Constructs a RoiProperties using the specified title for a given image and roi;
 	 * call showDialog for the actual dialog.
 	 * Note that the title determines which fields will be shown in the dialog.
 	 */
@@ -71,11 +72,13 @@ public class RoiProperties implements ModifyListener, ShellListener {
 		}
 	}
 
-	/** Constructs a RoiProperties using the specified title for a given roi;
-	 *  call showDialog for the actual dialog.
-	 *  Note that the title determines which fields will be shown in the dialog. */
-
+	/**
+	 * Constructs a RoiProperties using the specified title for a given roi;
+	 * call showDialog for the actual dialog.
+	 * Note that the title determines which fields will be shown in the dialog.
+	 */
 	public RoiProperties(String title, Roi roi) {
+
 		this(title, WindowManager.getCurrentImage(), roi);
 	}
 
@@ -172,9 +175,9 @@ public class RoiProperties implements ModifyListener, ShellListener {
 				gd.addStringField("Fill color:", fillc);
 			}
 		}
-		boolean askShowOnAllSlices = addToOverlay && imp!=null && imp.getNSlices()>1;
-		if (askShowOnAllSlices)
-			gd.addCheckbox("Show on all Slices", roi.getPosition()==0&&!roi.hasHyperStackPosition());
+		boolean askShowOnAllSlices = addToOverlay && imp != null && imp.getNSlices() > 1;
+		if(askShowOnAllSlices)
+			gd.addCheckbox("Show on all Slices", roi.getPosition() == 0 && !roi.hasHyperStackPosition());
 		if(addToOverlay)
 			gd.addCheckbox("New overlay", false);
 		if(overlayOptions) {
@@ -255,13 +258,13 @@ public class RoiProperties implements ModifyListener, ShellListener {
 			} else
 				fillc = gd.getNextString();
 		}
-		if (askShowOnAllSlices) {
+		if(askShowOnAllSlices) {
 			boolean overlayOnAllSlices = gd.getNextBoolean();
-			if (overlayOnAllSlices)
+			if(overlayOnAllSlices)
 				roi.setPosition(0);
-			else if (roi.getPosition() == 0)
+			else if(roi.getPosition() == 0)
 				roi.setPosition(imp);
-		}	
+		}
 		boolean applyToOverlay = false;
 		boolean newOverlay = addToOverlay ? gd.getNextBoolean() : false;
 		if(overlayOptions) {
@@ -323,13 +326,13 @@ public class RoiProperties implements ModifyListener, ShellListener {
 			Undo.setup(Undo.OVERLAY, imp);
 			Roi[] rois = overlay.toArray();
 			for(int i = 0; i < rois.length; i++) {
-				if (strokeColor != null)
+				if(strokeColor != null)
 					rois[i].setStrokeColor(strokeColor);
 				if(strokeWidth2 != strokeWidth)
 					rois[i].setStrokeWidth((float)strokeWidth2);
 				rois[i].setFillColor(fillColor);
-				if (setPositions) {
-					if (rois[i].getPosition()==0 && !rois[i].hasHyperStackPosition())
+				if(setPositions) {
+					if(rois[i].getPosition() == 0 && !rois[i].hasHyperStackPosition())
 						rois[i].setPosition(imp);
 				} else
 					rois[i].setPosition(0);
@@ -469,7 +472,7 @@ public class RoiProperties implements ModifyListener, ShellListener {
 		TextField tf = (TextField)e.getSource();
 		String str = tf.getText();
 		double group = Tools.parseDouble(str, Double.NaN);
-		if(!Double.isNaN(group) && group >= 0 && group <= 255) {
+		if(!Double.isNaN(group) && group >= 0 && group <= Roi.MAX_ROI_GROUP) {
 			roi.setGroup((int)group);
 			String name = Roi.getGroupName((int)group);
 			if(name == null)
