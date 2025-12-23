@@ -1,19 +1,19 @@
 package ij.plugin.tool;
 
-import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Scrollbar;
-import java.awt.TextField;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Slider;
 // Versions
 // 2012-07-22 shift to confine horizontally or vertically, ctrl-shift to resize, ctrl to pick
+import org.eclipse.swt.widgets.Text;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -215,11 +215,11 @@ public class BrushTool extends PlugInTool implements Runnable {
 			this.width = width;
 		} else {
 			Vector numericFields = gd.getNumericFields();
-			TextField widthField = (TextField)numericFields.elementAt(0);
+			Text widthField = (Text)numericFields.elementAt(0);
 			widthField.setText("" + width);
 			Vector sliders = gd.getSliders();
-			Scrollbar sb = (Scrollbar)sliders.elementAt(0);
-			sb.setValue(width);
+			Slider sb = (Slider)sliders.elementAt(0);
+			sb.setSelection(width);
 		}
 	}
 
@@ -230,8 +230,8 @@ public class BrushTool extends PlugInTool implements Runnable {
 		String name = Colors.colorToString2(c);
 		if(name.length() > 0) {
 			Vector choices = gd.getChoices();
-			Choice ch = (Choice)choices.elementAt(0);
-			ch.select(name);
+			Combo ch = (Combo)choices.elementAt(0);
+			ch.select(ch.indexOf(name));
 		}
 	}
 
