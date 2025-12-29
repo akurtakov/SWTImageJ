@@ -366,6 +366,8 @@ public class SWTUtils {
 		if((event.stateMask & SWT.ALT) != 0) {
 			modifiers |= InputEvent.ALT_DOWN_MASK;
 		}
+		if((event.stateMask & SWT.COMMAND) != 0)
+			modifiers |= InputEvent.META_DOWN_MASK;
 		MouseEvent awtMouseEvent = new MouseEvent(ImageJ.DUMMY_PANEL, event.hashCode(), event.time, modifiers, event.x, event.y, 1, false, button);
 		return awtMouseEvent;
 	}

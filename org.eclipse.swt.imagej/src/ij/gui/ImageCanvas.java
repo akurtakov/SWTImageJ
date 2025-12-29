@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.jfree.swt.SWTGraphics2D;
 import org.jfree.swt.SWTUtils;
+import org.jfree.swt.SwtToAwtLegacy;
 
 import ij.IJ;
 import ij.ImageJ;
@@ -1735,7 +1736,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		isClicked = true;
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		// flags = 501;
-		flags = java.awt.event.MouseEvent.MOUSE_PRESSED;
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		// System.out.println(flags);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		calculateAspectRatio();
@@ -2012,6 +2013,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		/* Converting SWT to AWT MouseEvents! */
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		// flags = 505;
 		// flags=java.awt.event.MouseEvent.MOUSE_EXITED;
 		PlugInTool tool = Toolbar.getPlugInTool();
@@ -2041,7 +2043,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 
 		/* AWT dragging flag value! */
 		// flags = 506;
-		flags = java.awt.event.MouseEvent.MOUSE_DRAGGED;
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		// int x = e.getX();
 		// int y = e.getY();
 		// int x = e.getX();
@@ -2360,7 +2362,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		 * java.awt.event.MouseEvent.MOUSE_CLICKED
 		 */
 		// flags = 502;
-		flags = java.awt.event.MouseEvent.MOUSE_RELEASED;
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		/* mouseClicked implementation! */
 		if(isClicked) {
@@ -2501,7 +2503,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		// flags=503; This flag doesn't work well in the overlay editing tools!
-		flags = java.awt.event.MouseEvent.MOUSE_MOVED;
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		if(drag) {
 			calculateAspectRatio();
 			endX = (int)(e.x / aspectRatioX);
@@ -2572,7 +2574,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	public void mouseClicked(MouseEvent e) {
 
 		/* Converting SWT to AWT MouseEvents! */
-		flags = 0;
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		PlugInTool tool = Toolbar.getPlugInTool();
