@@ -62,7 +62,6 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 
 	protected int startX;
 	protected int startY;
-	protected boolean drag;
 	protected int endX;
 	protected int endY;
 	private Display shellDisplay;
@@ -1732,10 +1731,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	public void mouseDown(MouseEvent e) {
 
 		/* Converting SWT to AWT MouseEvents! */
-		drag = true;
 		isClicked = true;
-		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
-		// flags = 501;
 		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		// System.out.println(flags);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
@@ -2014,8 +2010,6 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
-		// flags = 505;
-		// flags=java.awt.event.MouseEvent.MOUSE_EXITED;
 		PlugInTool tool = Toolbar.getPlugInTool();
 		if(tool != null) {
 			tool.mouseExit(imp, e);
@@ -2038,16 +2032,11 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 
 	}
 
-	/* In SWT not available. Implemented here from mouse down an up! */
+	/* In SWT not available. Implemented here from mouse move with Button detection)! */
 	public void mouseDragged(MouseEvent e) {
 
-		/* AWT dragging flag value! */
-		// flags = 506;
+		/* AWT dragging using deprecated flag value! */
 		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
-		// int x = e.getX();
-		// int y = e.getY();
-		// int x = e.getX();
-		// int y = e.getY();
 		/* Using SWT! */
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
@@ -2056,7 +2045,6 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		int y = (int)(e.y / aspectRatioY);
 		xMouse = offScreenX(x);
 		yMouse = offScreenY(y);
-		// System.out.println(flags);
 		mousePressedX = mousePressedY = -1;
 		if(flags == 0) // workaround for Mac OS 9 bug
 			flags = SWT.BUTTON1;
@@ -2353,16 +2341,11 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	public void mouseUp(MouseEvent e) {
 
 		/* Converting SWT to AWT MouseEvents! */
-		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
-		// System.out.println(flags);
-		drag = false;
 		/*
 		 * For flags see:
 		 * https://docs.oracle.com/javase%2F7%2Fdocs%2Fapi%2F%2F/constant-values.html#
 		 * java.awt.event.MouseEvent.MOUSE_CLICKED
 		 */
-		// flags = 502;
-		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		/* mouseClicked implementation! */
 		if(isClicked) {
@@ -2403,6 +2386,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 			if(evt.isConsumed())
 				return;
 		}
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		flags &= ~SWT.BUTTON1; // make sure button 1 bit is not set
 		flags &= ~SWT.BUTTON2; // make sure button 2 bit is not set
 		flags &= ~SWT.BUTTON3; // make sure button 3 bit is not set
@@ -2499,17 +2483,16 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	public void mouseMove(MouseEvent e) {
 
 		/* Converting SWT to AWT MouseEvents! */
-		// gc = new GC((Canvas) e.widget);
-		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
-		// flags=503; This flag doesn't work well in the overlay editing tools!
 		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
-		if(drag) {
+		/* Detect mouse drag - Left Button pressed! */
+		if((e.stateMask & SWT.BUTTON1) != 0) {
 			calculateAspectRatio();
 			endX = (int)(e.x / aspectRatioX);
 			endY = (int)(e.y / aspectRatioY);
 			mouseDragged(e);
 			return;
+			// Implement your movement logic here
 		}
 		//
 		/*
@@ -2565,18 +2548,18 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		// flags = 504;
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
+		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		PlugInTool tool = Toolbar.getPlugInTool();
 		if(tool != null)
 			tool.mouseEnter(imp, e);
 	}
 
-	/* In SWT as mouseClicked used. Activated from MouseDown! */
+	/* In SWT as mouseClicked used. Activated from MouseUp! */
 	public void mouseClicked(MouseEvent e) {
 
 		/* Converting SWT to AWT MouseEvents! */
 		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
 		// java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
-		java.awt.event.MouseEvent evt = SWTUtils.toAwtMouseEvent(e);
 		PlugInTool tool = Toolbar.getPlugInTool();
 		if(tool != null)
 			tool.mouseClicked(imp, e);
