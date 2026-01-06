@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.jfree.swt.SWTGraphics2D;
 import org.jfree.swt.SWTUtils;
-import org.jfree.swt.SwtToAwtLegacy;
 
 import ij.IJ;
 import ij.ImageJ;
@@ -56,6 +55,7 @@ import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
 import ij.plugin.tool.PlugInTool;
 import ij.process.FloatPolygon;
+import ij.swt.SwtToAwtLegacy;
 import ij.util.Tools;
 
 public class ImageCanvas extends Canvas implements MouseListener, MouseWheelListener, MouseTrackListener, Cloneable, MouseMoveListener, PaintListener, DisposeListener {
@@ -2046,8 +2046,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		xMouse = offScreenX(x);
 		yMouse = offScreenY(y);
 		mousePressedX = mousePressedY = -1;
-		if(flags == 0) // workaround for Mac OS 9 bug
-			flags = SWT.BUTTON1;
+		if(flags == 0) // workaround for Mac OS 9 bug with deprecated AWT flag.
+			flags = java.awt.event.MouseEvent.BUTTON1_MASK;
 		if(Toolbar.getToolId() == Toolbar.HAND || IJ.spaceBarDown())
 			scroll(x, y);
 		else {
@@ -2387,9 +2387,10 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 				return;
 		}
 		flags = SwtToAwtLegacy.fromSwtMouseEvent(e);
-		flags &= ~SWT.BUTTON1; // make sure button 1 bit is not set
-		flags &= ~SWT.BUTTON2; // make sure button 2 bit is not set
-		flags &= ~SWT.BUTTON3; // make sure button 3 bit is not set
+		/* We ,must use here the deprecated AWT flags for existing macros and plugins! */
+		flags &= ~java.awt.event.MouseEvent.BUTTON1_MASK; // make sure button 1 bit is not set
+		flags &= ~java.awt.event.MouseEvent.BUTTON2_MASK; // make sure button 2 bit is not set
+		flags &= ~java.awt.event.MouseEvent.BUTTON3_MASK; // make sure button 3 bit is not set
 		Roi roi = imp.getRoi();
 		if(roi != null) {
 			/* Convert to SWT Rectangle */
@@ -2492,21 +2493,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 			endY = (int)(e.y / aspectRatioY);
 			mouseDragged(e);
 			return;
-			// Implement your movement logic here
 		}
-		//
-		/*
-		 * Image image = new Image(e.display, 1, 1); GC gc = new GC((Canvas) e.widget);
-		 * gc.copyArea(image, e.x, e.y); ImageData imageData = image.getImageData(); int
-		 * pixelValue = imageData.getPixel(0, 0); PaletteData palette =
-		 * imageData.palette; RGB rgb = palette.getRGB(pixelValue);
-		 * System.out.println(rgb); System.out.println("Coordinates" + e.x + "  " +
-		 * e.y);
-		 */
-		/* ImageJ starts here! */
-		// if (ij==null) return;
-		// int sx = e.getX();
-		// int sy = e.getY();
 		calculateAspectRatio();
 		int sx = (int)(e.x / aspectRatioX);
 		int sy = (int)(e.y / aspectRatioY);

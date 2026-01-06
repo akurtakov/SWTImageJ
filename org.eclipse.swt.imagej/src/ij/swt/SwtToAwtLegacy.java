@@ -1,4 +1,4 @@
-package org.jfree.swt;
+package ij.swt;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
