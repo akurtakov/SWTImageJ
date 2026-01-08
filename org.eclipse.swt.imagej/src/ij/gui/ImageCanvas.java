@@ -850,7 +850,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 			if(font != null && font.getSize() > 14)
 				h2 = (int)(h2 * 0.8);
 			g.setColor(bgColor);
-			g.fillRoundRect(x - 1 + xoffset, y - h2 + 2 + yoffset, w + 1, h2 - 2, 5, 5);
+			g.fillRoundRect(x - 1 + xoffset, y - h2 + 2 + yoffset, w + 1, h2 - 2, 4, 4);
 		}
 		if(labelRects != null && index < labelRects.length) {
 			if(pointRoi) {
@@ -862,7 +862,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 				labelRects[index] = new Rectangle(x - 3, y - h + 1, w + 4, h);
 		}
 		g.setColor(labelColor);
-		g.drawString(label, x + xoffset, y - 2 + yoffset);
+		g.drawString(label, x - 1 + xoffset, y - 3 + yoffset);
 		g.setColor(defaultColor);
 	}
 
