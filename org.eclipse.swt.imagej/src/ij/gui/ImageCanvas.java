@@ -412,8 +412,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	/* Changed for SWT! */
 	public void requestFocus() {
 
-		this.forceFocus();
-		// requestFocus();
+		this.setFocus();
 	}
 
 	/*

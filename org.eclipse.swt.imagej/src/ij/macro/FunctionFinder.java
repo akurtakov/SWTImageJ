@@ -30,8 +30,8 @@ import ij.util.Tools;
  * written by jerome.mutterer at ibmp.fr, and is based on Mark Longair's
  * CommandFinder plugin.
  */
-public class FunctionFinder
-		implements org.eclipse.swt.events.ModifyListener, SelectionListener, ShellListener, KeyListener {
+public class FunctionFinder implements org.eclipse.swt.events.ModifyListener, SelectionListener, ShellListener, KeyListener {
+
 	private static String url = "http://wsr.imagej.net/developer/macro/functions.html";
 	private static Shell dialog;
 	private org.eclipse.swt.widgets.Text prompt;
@@ -43,9 +43,8 @@ public class FunctionFinder
 	public FunctionFinder(Editor editor) {
 
 		this.editor = editor;
-
 		String f = Tools.openFromIJJarAsString("/functions.html");
-		if (f==null) {
+		if(f == null) {
 			IJ.error("\"functions.html\" not found in ij.jar");
 			return;
 		}
@@ -53,20 +52,19 @@ public class FunctionFinder
 		String[] l = f.split("\n");
 		commands = new String[l.length];
 		int c = 0;
-		for (int i = 0; i < l.length; i++) {
+		for(int i = 0; i < l.length; i++) {
 			String line = l[i];
-			if (line.startsWith("<b>")) {
+			if(line.startsWith("<b>")) {
 				commands[c] = line.substring(line.indexOf("<b>") + 3, line.indexOf("</b>"));
 				c++;
 			}
 		}
-		if (c == 0) {
+		if(c == 0) {
 			IJ.error("ImageJ/macros/functions.html is corrupted");
 			return;
 		}
-
 		ImageJ imageJ = IJ.getInstance();
-		if (dialog == null) {
+		if(dialog == null) {
 			dialog = new Shell(Display.getDefault(), SWT.DIALOG_TRIM | SWT.RESIZE);
 			dialog.setSize(300, 500);
 			dialog.setText("Built-in Functions");
@@ -109,175 +107,183 @@ public class FunctionFinder
 			// GUI.scale(dialog);
 			dialog.pack();
 		}
-
 		Object frame = WindowManager.getFrontWindow();
-		if (frame == null)
+		if(frame == null)
 			return;
 		Point posi = null;
-		if (frame instanceof Shell) {
-			posi = ((Shell) frame).getLocation();
-		} else if (frame instanceof Shell) {
-			posi = ((WindowSwt) frame).getShell().getLocation();
+		if(frame instanceof Shell) {
+			posi = ((Shell)frame).getLocation();
+		} else if(frame instanceof Shell) {
+			posi = ((WindowSwt)frame).getShell().getLocation();
 		}
-
 		// java.awt.Point posi=frame.getLocationOnScreen();
-		int initialX = (int) posi.x + 38;
-		int initialY = (int) posi.y + 84;
+		int initialX = (int)posi.x + 38;
+		int initialY = (int)posi.y + 84;
 		dialog.setLocation(initialX, initialY);
 		dialog.setVisible(true);
 		dialog.forceActive();
 	}
 
 	public FunctionFinder() {
+
 		this(null);
 	}
 
 	public void populateList(String matchingSubstring) {
+
 		String substring = matchingSubstring.toLowerCase();
 		functions.removeAll();
 		try {
-			for (int i = 0; i < commands.length; ++i) {
+			for(int i = 0; i < commands.length; ++i) {
 				String commandName = commands[i];
-				if (commandName.length() == 0)
+				if(commandName.length() == 0)
 					continue;
 				String lowerCommandName = commandName.toLowerCase();
-				if (lowerCommandName.indexOf(substring) >= 0) {
+				if(lowerCommandName.indexOf(substring) >= 0) {
 					functions.add(commands[i]);
 				}
 			}
-		} catch (Exception e) {
+		} catch(Exception e) {
 		}
 	}
 
 	public void edPaste(String arg) {
-		Object frame = WindowManager.getActiveWindow();
-		if (!(frame instanceof Editor))
-			return;
 
+		Object frame = WindowManager.getActiveWindow();
+		if(!(frame instanceof Editor))
+			return;
 		try {
-			StyledText ta = ((Editor) frame).getTextArea();
-			editor = (Editor) frame;
+			StyledText ta = ((Editor)frame).getTextArea();
+			editor = (Editor)frame;
 			int start = ta.getSelectionRange().x;
 			int length = ta.getSelectionRange().y;
 			try {
 				ta.replaceTextRange(start, length, arg.substring(0, arg.length()));
-			} catch (Exception e) {
+			} catch(Exception e) {
 			}
-			if (IJ.isMacOSX())
+			if(IJ.isMacOSX())
 				ta.setCaretOffset(start + arg.length());
-		} catch (Exception e) {
+		} catch(Exception e) {
 		}
 	}
 
 	public void itemStateChanged(SelectionEvent ie) {
+
 		populateList(prompt.getText());
 	}
 
 	protected void runFromLabel(String listLabel) {
+
 		edPaste(listLabel);
 		closeAndRefocus();
 	}
 
 	public void close() {
+
 		closeAndRefocus();
 	}
 
 	public void closeAndRefocus() {
-		if (dialog != null) {
-			if (dialog.isDisposed() == false) {
+
+		if(dialog != null) {
+			if(dialog.isDisposed() == false) {
 				dialog.dispose();
 				dialog = null;
 			}
 		}
-		if (editor != null)
+		if(editor != null)
 			editor.getShell().forceActive();
 	}
 
 	public void keyPressed(KeyEvent ke) {
+
 		int key = ke.keyCode;
 		int items = functions.getItemCount();
 		Object source = ke.getSource();
-		if (source == prompt) {
-			if (key == SWT.CR || key == SWT.KEYPAD_CR) {
-				if (1 == items) {
+		if(source == prompt) {
+			if(key == SWT.CR || key == SWT.KEYPAD_CR) {
+				if(1 == items) {
 					String selected = functions.getItem(0);
 					edPaste(selected);
 				}
-			} else if (key == SWT.ARROW_UP) {
-				functions.forceFocus();
-				if (items > 0)
+			} else if(key == SWT.ARROW_UP) {
+				functions.setFocus();
+				if(items > 0)
 					functions.select(functions.getItemCount() - 1);
-			} else if (key == SWT.ESC) {
+			} else if(key == SWT.ESC) {
 				closeAndRefocus();
-			} else if (key == SWT.ARROW_DOWN) {
-				functions.forceFocus();
-				if (items > 0)
+			} else if(key == SWT.ARROW_DOWN) {
+				functions.setFocus();
+				if(items > 0)
 					functions.select(0);
 			}
-		} else if (source == functions) {
-			if (key == SWT.CR || key == SWT.KEYPAD_CR) {
+		} else if(source == functions) {
+			if(key == SWT.CR || key == SWT.KEYPAD_CR) {
 				String selected = functions.getItem(functions.getSelectionIndex());
-				if (selected != null)
+				if(selected != null)
 					edPaste(selected);
-			} else if (key == SWT.ESC) {
+			} else if(key == SWT.ESC) {
 				closeAndRefocus();
-			} else if (key == SWT.SPACE || key == SWT.DEL) {
+			} else if(key == SWT.SPACE || key == SWT.DEL) {
 				/*
 				 * If someone presses backspace or delete they probably want to remove the last
 				 * letter from the search string, so switch the focus back to the prompt:
 				 */
-				prompt.forceFocus();
+				prompt.setFocus();
 			}
 		}
 	}
 
 	public void keyReleased(KeyEvent ke) {
+
 	}
 
 	public void keyTyped(KeyEvent ke) {
+
 	}
 
 	@Override
 	public void modifyText(ModifyEvent e) {
-		textValueChanged(e);
 
+		textValueChanged(e);
 	}
 
 	public void textValueChanged(ModifyEvent te) {
+
 		populateList(prompt.getText());
 	}
 
 	public void actionPerformed(SelectionEvent e) {
+
 		String url2 = this.url;
 		Object b = e.getSource();
-		if (b == insertButton) {
+		if(b == insertButton) {
 			int index = functions.getSelectionIndex();
-			if (index >= 0) {
+			if(index >= 0) {
 				String selected = functions.getItem(index);
 				edPaste(selected);
 			}
-		} else if (b == infoButton) {
+		} else if(b == infoButton) {
 			int index = functions.getSelectionIndex();
-			if (index >= 0) {
+			if(index >= 0) {
 				String selected = functions.getItem(index);
 				int index2 = selected.indexOf("(");
-				if (index2 == -1)
+				if(index2 == -1)
 					index2 = selected.length();
 				url2 = url2 + "#" + selected.substring(0, index2);
 			}
 			IJ.runPlugIn("ij.plugin.BrowserLauncher", url2);
-		} else if (b == closeButton)
+		} else if(b == closeButton)
 			closeAndRefocus();
 	}
-
 	/*
 	 * public void windowClosing(WindowEvent e) { closeAndRefocus(); }
 	 */
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		actionPerformed(e);
 
+		actionPerformed(e);
 	}
 
 	@Override
@@ -294,8 +300,8 @@ public class FunctionFinder
 
 	@Override
 	public void shellClosed(ShellEvent e) {
-		closeAndRefocus();
 
+		closeAndRefocus();
 	}
 
 	@Override
@@ -315,5 +321,4 @@ public class FunctionFinder
 		// TODO Auto-generated method stub
 
 	}
-
 }

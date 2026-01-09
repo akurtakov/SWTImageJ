@@ -286,7 +286,7 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 			setFont();
 			positionWindow();
 			if(addRunBar)
-				ta.forceFocus(); // needed for selections to show
+				ta.setFocus(); // needed for selections to show
 			if(!IJ.isJava18() && !IJ.isLinux())
 				insertSpaces = false;
 		});

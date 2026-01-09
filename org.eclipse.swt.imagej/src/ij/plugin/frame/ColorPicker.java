@@ -28,6 +28,7 @@ import ij.process.ColorProcessor;
 
 /** Implements the Image/Color/Color Picker command. */
 public class ColorPicker extends PlugInDialog {
+
 	public static int ybase = 2;
 	private int colorWidth = 22;
 	private int colorHeight = 16;
@@ -40,26 +41,24 @@ public class ColorPicker extends PlugInDialog {
 	Text colorField;
 
 	public ColorPicker() {
-		super("CP");
-		if (instance != null) {
-			Display.getDefault().syncExec(() -> {
-				shell.forceFocus();
 
+		super("CP");
+		if(instance != null) {
+			Display.getDefault().syncExec(() -> {
+				shell.setFocus();
 			});
 			return;
 		}
 		double scale = Prefs.getGuiScale();
 		instance = this;
-
-		int width = (int) (columns * colorWidth * scale);
-		int height = (int) ((rows * colorHeight + ybase) * scale);
+		int width = (int)(columns * colorWidth * scale);
+		int height = (int)((rows * colorHeight + ybase) * scale);
 		Display.getDefault().syncExec(() -> {
 			WindowManager.addWindow(ColorPicker.this);
 			shell.addKeyListener(IJ.getInstance());
 			shell.setLayout(new org.eclipse.swt.layout.GridLayout(1, true));
 			cg = new ColorGenerator(width, height, new int[width * height]);
 			cg.drawColors(colorWidth, colorHeight, columns, rows);
-
 			org.eclipse.swt.widgets.Composite panel = new org.eclipse.swt.widgets.Composite(shell, SWT.NONE);
 			panel.setLayout(new org.eclipse.swt.layout.GridLayout(1, true));
 			panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -80,18 +79,18 @@ public class ColorPicker extends PlugInDialog {
 			shell.layout();
 			shell.pack();
 			Point loc = Prefs.getLocation(LOC_KEY);
-			if (loc != null)
+			if(loc != null)
 				shell.setLocation(loc.x, loc.y);
 			else
 				GUI.centerOnImageJScreen(ColorPicker.this.shell);
 			shell.setSize(width + 50, height + 100);
 			shell.setVisible(true);
-
 		});
 	}
 
 	/** Overrides shellClosed() in PlugInDialog. */
 	public void shellClosed(ShellEvent e) {
+
 		e.doit = false;
 		// super.close();
 		instance = null;
@@ -101,28 +100,31 @@ public class ColorPicker extends PlugInDialog {
 	}
 
 	public static void update() {
+
 		ColorPicker cp = instance;
-		if (cp != null && cp.colorCanvas != null) {
+		if(cp != null && cp.colorCanvas != null) {
 			cp.cg.refreshBackground(false);
 			cp.cg.refreshForeground(false);
 			cp.colorCanvas.redraw();
 			cp.colorField.setText(Colors.colorToString(Toolbar.getForegroundColor()));
 		}
 	}
-
 }
 
 class ColorGenerator extends ColorProcessor {
+
 	private int ybase = ColorPicker.ybase;
 	private int w, h;
-	private int[] colors = { 0xff0000, 0x00ff00, 0x0000ff, 0xffffff, 0x00ffff, 0xff00ff, 0xffff00, 0x000000 };
+	private int[] colors = {0xff0000, 0x00ff00, 0x0000ff, 0xffffff, 0x00ffff, 0xff00ff, 0xffff00, 0x000000};
 
 	public ColorGenerator(int width, int height, int[] pixels) {
+
 		super(width, height, pixels);
 		setAntialiasedText(true);
 	}
 
 	void drawColors(int colorWidth, int colorHeight, int columns, int rows) {
+
 		w = colorWidth;
 		h = colorHeight;
 		setColor(0xffffff);
@@ -132,25 +134,23 @@ class ColorGenerator extends ColorProcessor {
 		resetBW();
 		flipper();
 		// drawLine(0, 256, 110, 256);
-
 		refreshBackground(false);
 		refreshForeground(false);
-
 		Color c;
 		float hue, saturation = 1f, brightness = 1f;
 		double w = colorWidth, h = colorHeight;
-		for (int x = 2; x < 10; x++) {
-			for (int y = 0; y < 32; y++) {
-				hue = (float) (y / (2 * h) - .15);
-				if (x < 6) {
+		for(int x = 2; x < 10; x++) {
+			for(int y = 0; y < 32; y++) {
+				hue = (float)(y / (2 * h) - .15);
+				if(x < 6) {
 					saturation = 1f;
-					brightness = (float) (x * 4 / w);
+					brightness = (float)(x * 4 / w);
 				} else {
-					saturation = 1f - ((float) ((5 - x) * -4 / w));
+					saturation = 1f - ((float)((5 - x) * -4 / w));
 					brightness = 1f;
 				}
 				c = Color.getHSBColor(hue, saturation, brightness);
-				setRoi(x * (int) (w / 2), ybase + y * (int) (h / 2), (int) w / 2, (int) h / 2);
+				setRoi(x * (int)(w / 2), ybase + y * (int)(h / 2), (int)w / 2, (int)h / 2);
 				setColor(c);
 				fill();
 			}
@@ -160,12 +160,14 @@ class ColorGenerator extends ColorProcessor {
 	}
 
 	void drawColor(int x, int y, Color c) {
+
 		setRoi(x * w, y * h, w, h);
 		setColor(c);
 		fill();
 	}
 
 	public void refreshBackground(boolean backgroundInFront) {
+
 		// Boundary for Background Selection
 		setColor(0x444444);
 		drawRect((w * 2) - 12, ybase + 276, (w * 2) + 4, (h * 2) + 4);
@@ -175,11 +177,12 @@ class ColorGenerator extends ColorProcessor {
 		Color bg = Toolbar.getBackgroundColor();
 		setColor(bg);
 		fill();
-		if (backgroundInFront)
+		if(backgroundInFront)
 			drawLabel("B", bg, w * 4 - 18, ybase + 278 + h * 2);
 	}
 
 	public void refreshForeground(boolean backgroundInFront) {
+
 		// Boundary for Foreground Selection
 		setColor(0x444444);
 		drawRect(8, ybase + 266, (w * 2) + 4, (h * 2) + 4);
@@ -189,11 +192,12 @@ class ColorGenerator extends ColorProcessor {
 		Color fg = Toolbar.getForegroundColor();
 		setColor(fg);
 		fill();
-		if (backgroundInFront)
+		if(backgroundInFront)
 			drawLabel("F", fg, 12, ybase + 268 + 14);
 	}
 
 	private void drawLabel(String label, Color c, int x, int y) {
+
 		int intensity = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
 		c = intensity < 128 ? Color.white : Color.black;
 		setColor(c);
@@ -201,12 +205,13 @@ class ColorGenerator extends ColorProcessor {
 	}
 
 	void drawSpectrum(double h) {
+
 		Color c;
-		for (int x = 5; x < 7; x++) {
-			for (int y = 0; y < 32; y++) {
-				float hue = (float) (y / (2 * h) - .15);
+		for(int x = 5; x < 7; x++) {
+			for(int y = 0; y < 32; y++) {
+				float hue = (float)(y / (2 * h) - .15);
 				c = Color.getHSBColor(hue, 1f, 1f);
-				setRoi(x * (int) (w / 2), ybase + y * (int) (h / 2), (int) w / 2, (int) h / 2);
+				setRoi(x * (int)(w / 2), ybase + y * (int)(h / 2), (int)w / 2, (int)h / 2);
 				setColor(c);
 				fill();
 			}
@@ -232,16 +237,18 @@ class ColorGenerator extends ColorProcessor {
 	}
 
 	void drawRamp() {
+
 		int r, g, b;
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < (h * 16); y++) {
-				r = g = b = (byte) y;
+		for(int x = 0; x < w; x++) {
+			for(int y = 0; y < (h * 16); y++) {
+				r = g = b = (byte)y;
 				set(x, ybase + y, 0xff000000 | ((r << 16) & 0xff0000) | ((g << 8) & 0xff00) | (b & 0xff));
 			}
 		}
 	}
 
 	void resetBW() { // Paints the Color Reset Button
+
 		setColor(0x000000);
 		setRoi(92, ybase + 300, 9, 7);
 		fill();
@@ -252,6 +259,7 @@ class ColorGenerator extends ColorProcessor {
 	}
 
 	void flipper() { // Paints the Flipper Button
+
 		int xa = 90;
 		int ya = ybase + 272;
 		setColor(0x000000);
@@ -267,25 +275,19 @@ class ColorGenerator extends ColorProcessor {
 		drawLine(xa + 9, ya + 9, xa + 4, ya + 9);
 		drawLine(xa + 8, ya + 8, xa + 3, ya + 8);
 	}
-
 }
 
-class ColorCanvas extends org.eclipse.swt.widgets.Canvas
-		implements PaintListener, org.eclipse.swt.events.MouseListener, org.eclipse.swt.events.MouseMoveListener {
+class ColorCanvas extends org.eclipse.swt.widgets.Canvas implements PaintListener, org.eclipse.swt.events.MouseListener, org.eclipse.swt.events.MouseMoveListener {
 
-	private static org.eclipse.swt.graphics.Cursor defaultCursor = new org.eclipse.swt.graphics.Cursor(
-			Display.getDefault(), SWT.CURSOR_ARROW);
-	private static org.eclipse.swt.graphics.Cursor crosshairCursor = new org.eclipse.swt.graphics.Cursor(
-			Display.getDefault(), SWT.CURSOR_CROSS);
+	private static org.eclipse.swt.graphics.Cursor defaultCursor = new org.eclipse.swt.graphics.Cursor(Display.getDefault(), SWT.CURSOR_ARROW);
+	private static org.eclipse.swt.graphics.Cursor crosshairCursor = new org.eclipse.swt.graphics.Cursor(Display.getDefault(), SWT.CURSOR_CROSS);
 	int ybase = ColorPicker.ybase;
 	org.eclipse.swt.graphics.Rectangle flipperRect = new org.eclipse.swt.graphics.Rectangle(86, ybase + 268, 18, 18);
 	org.eclipse.swt.graphics.Rectangle resetRect = new org.eclipse.swt.graphics.Rectangle(84, ybase + 293, 21, 18);
 	org.eclipse.swt.graphics.Rectangle foreground1Rect = new org.eclipse.swt.graphics.Rectangle(9, ybase + 266, 45, 10);
 	org.eclipse.swt.graphics.Rectangle foreground2Rect = new org.eclipse.swt.graphics.Rectangle(9, ybase + 276, 23, 25);
-	org.eclipse.swt.graphics.Rectangle background1Rect = new org.eclipse.swt.graphics.Rectangle(33, ybase + 302, 45,
-			10);
-	org.eclipse.swt.graphics.Rectangle background2Rect = new org.eclipse.swt.graphics.Rectangle(56, ybase + 277, 23,
-			25);
+	org.eclipse.swt.graphics.Rectangle background1Rect = new org.eclipse.swt.graphics.Rectangle(33, ybase + 302, 45, 10);
+	org.eclipse.swt.graphics.Rectangle background2Rect = new org.eclipse.swt.graphics.Rectangle(56, ybase + 277, 23, 25);
 	int width, height;
 	Vector colors;
 	boolean background;
@@ -297,6 +299,7 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 	private Composite panel;
 
 	public ColorCanvas(Composite panel, int width, int height, ColorPicker cp, ColorGenerator ip, double scale) {
+
 		super(panel, SWT.DOUBLE_BUFFERED);
 		this.panel = panel;
 		this.width = width;
@@ -312,6 +315,7 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 	}
 
 	public Dimension getPreferredSize() {
+
 		return new Dimension(width, height);
 	}
 
@@ -319,60 +323,61 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 	 * public void update(Graphics g) { paint(g); }
 	 */
 	public void repaint() {
+
 		Display.getDefault().syncExec(() -> {
 			redraw();
-
 		});
 	}
 
 	@Override
 	public void paintControl(PaintEvent e) {
+
 		GC gc = e.gc;
 		paint(gc);
-
 	}
 
 	public void paint(GC gc) {
+
 		// gc.drawImage(ip.createImageSwt(), 0, 0, , null);
-		gc.drawImage(ip.createImageSwt(), 0, 0, ip.getWidth(), ip.getHeight(), 0, 0, (int) (ip.getWidth() * scale),
-				(int) (ip.getHeight() * scale));
+		gc.drawImage(ip.createImageSwt(), 0, 0, ip.getWidth(), ip.getHeight(), 0, 0, (int)(ip.getWidth() * scale), (int)(ip.getHeight() * scale));
 	}
 
 	public void mouseDown(org.eclipse.swt.events.MouseEvent e) {
+
 		// IJ.log("mousePressed "+e);
 		ip.setLineWidth(1);
-		if (Toolbar.getToolId() == Toolbar.DROPPER)
+		if(Toolbar.getToolId() == Toolbar.DROPPER)
 			IJ.setTool(Toolbar.RECTANGLE);
-		int x = (int) (e.x / scale);
-		int y = (int) (e.y / scale);
+		int x = (int)(e.x / scale);
+		int y = (int)(e.y / scale);
 		long difference = System.currentTimeMillis() - mouseDownTime;
 		boolean doubleClick = (difference <= 250);
 		mouseDownTime = System.currentTimeMillis();
-		if (flipperRect.contains(x, y)) {
+		if(flipperRect.contains(x, y)) {
 			Color c = Toolbar.getBackgroundColor();
 			Toolbar.setBackgroundColor(Toolbar.getForegroundColor());
 			Toolbar.setForegroundColor(c);
 			Recorder.setForegroundColor(Toolbar.getForegroundColor());
 			Recorder.setBackgroundColor(Toolbar.getBackgroundColor());
-		} else if (resetRect.contains(x, y)) {
+		} else if(resetRect.contains(x, y)) {
 			Toolbar.setForegroundColor(Color.white);
 			Toolbar.setBackgroundColor(Color.black);
 			Recorder.setForegroundColor(Color.white);
 			Recorder.setBackgroundColor(Color.black);
-		} else if ((background1Rect.contains(x, y)) || (background2Rect.contains(x, y))) {
+		} else if((background1Rect.contains(x, y)) || (background2Rect.contains(x, y))) {
 			background = true;
-			if (doubleClick)
+			if(doubleClick)
 				editColor();
 			// ip.refreshForeground(background);
 			// ip.refreshBackground(background);
-		} else if ((foreground1Rect.contains(x, y)) || (foreground2Rect.contains(x, y))) {
+		} else if((foreground1Rect.contains(x, y)) || (foreground2Rect.contains(x, y))) {
 			background = false;
-			if (doubleClick)
+			if(doubleClick)
 				editColor();
 			// ip.refreshBackground(background);
 			// ip.refreshForeground(background);
 		} else {
-			if (doubleClick)
+			if(doubleClick)
 				editColor();
 			else {
 				setDrawingColor(x, y, background);
@@ -380,7 +385,7 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 			}
 		}
 		Color color;
-		if (background) {
+		if(background) {
 			ip.refreshForeground(background);
 			ip.refreshBackground(background);
 			color = Toolbar.getBackgroundColor();
@@ -395,62 +400,68 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 	}
 
 	public void mouseMove(org.eclipse.swt.events.MouseEvent e) {
-		int x = (int) (e.x / scale);
-		int y = (int) (e.y / scale);
-		if (flipperRect.contains(x, y))
+
+		int x = (int)(e.x / scale);
+		int y = (int)(e.y / scale);
+		if(flipperRect.contains(x, y))
 			showStatus("Click to flip foreground and background colors", 0);
-		else if (resetRect.contains(x, y))
+		else if(resetRect.contains(x, y))
 			showStatus("Click to reset foreground to white, background to black", 0);
-		else if (!background && (background1Rect.contains(x, y) || background2Rect.contains(x, y)))
+		else if(!background && (background1Rect.contains(x, y) || background2Rect.contains(x, y)))
 			showStatus("Click to switch to background selection mode ", 0);
-		else if (background && (foreground1Rect.contains(x, y) || foreground2Rect.contains(x, y)))
+		else if(background && (foreground1Rect.contains(x, y) || foreground2Rect.contains(x, y)))
 			showStatus("Click to switch to foreground selection mode", 0);
 		else
 			showStatus("", ip.getPixel(x, y));
 	}
 
 	String pad(int n) {
+
 		String str = "" + n;
-		while (str.length() < 3)
+		while(str.length() < 3)
 			str = "0" + str;
 		return str;
 	}
 
 	void setDrawingColor(int x, int y, boolean setBackground) {
+
 		int p = ip.getPixel(x, y);
 		int r = (p & 0xff0000) >> 16;
 		int g = (p & 0xff00) >> 8;
 		int b = p & 0xff;
 		Color c = new Color(r, g, b);
-		if (setBackground) {
+		if(setBackground) {
 			Toolbar.setBackgroundColor(c);
-			if (IJ.recording())
+			if(IJ.recording())
 				Recorder.setBackgroundColor(c);
 		} else {
 			Toolbar.setForegroundColor(c);
-			if (IJ.recording())
+			if(IJ.recording())
 				Recorder.setForegroundColor(c);
 		}
 	}
 
 	void editColor() {
+
 		Color c = background ? Toolbar.getBackgroundColor() : Toolbar.getForegroundColor();
 		ColorChooser cc = new ColorChooser((background ? "Background" : "Foreground") + " Color", c, false);
 		c = cc.getColor();
-		if (background)
+		if(background)
 			Toolbar.setBackgroundColor(c);
 		else
 			Toolbar.setForegroundColor(c);
 	}
 
 	public void refreshColors() {
+
 		ip.refreshBackground(false);
 		ip.refreshForeground(false);
 		repaint();
 	}
 
 	private void showStatus(String msg, int rgb) {
-		if (msg.length() > 1)
+
+		if(msg.length() > 1)
 			IJ.showStatus(msg);
 		else {
 			int r = (rgb & 0xff0000) >> 16;
@@ -462,21 +473,26 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 	}
 
 	public void mouseExited(MouseEvent e) {
+
 		IJ.showStatus("");
 		setCursor(defaultCursor);
 	}
 
 	public void mouseEntered(MouseEvent e) {
+
 		setCursor(crosshairCursor);
 	}
 
 	public void mouseReleased(MouseEvent e) {
+
 	}
 
 	public void mouseClicked(MouseEvent e) {
+
 	}
 
 	public void mouseDragged(MouseEvent e) {
+
 	}
 
 	@Override
@@ -490,5 +506,4 @@ class ColorCanvas extends org.eclipse.swt.widgets.Canvas
 		// TODO Auto-generated method stub
 
 	}
-
 }
