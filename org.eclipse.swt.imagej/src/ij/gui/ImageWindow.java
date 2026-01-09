@@ -119,10 +119,8 @@ public class ImageWindow implements MouseWheelListener {
 	public void setTitle(String string) {
 
 		Display.getDefault().syncExec(() -> {
-
-			if (shell != null && !shell.isDisposed())
+			if(shell != null && !shell.isDisposed())
 				shell.setText(string);
-
 		});
 	}
 
@@ -137,9 +135,7 @@ public class ImageWindow implements MouseWheelListener {
 
 		AtomicReference<Boolean> visible = new AtomicReference<Boolean>();
 		Display.getDefault().syncExec(() -> {
-
 			visible.set(shell.isVisible());
-
 		});
 		return visible.get();
 	}
@@ -147,10 +143,8 @@ public class ImageWindow implements MouseWheelListener {
 	public void setVisible(boolean visible) {
 
 		Display.getDefault().syncExec(() -> {
-
 			Shell shell = getShell();
 			shell.setVisible(true);
-
 		});
 	}
 
@@ -159,7 +153,6 @@ public class ImageWindow implements MouseWheelListener {
 
 		Display.getDefault().syncExec(() -> {
 			shell.setVisible(true);
-
 		});
 	}
 
@@ -167,23 +160,19 @@ public class ImageWindow implements MouseWheelListener {
 	public Point getLocation() {
 
 		AtomicReference<Point> p = new AtomicReference<Point>();
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				p.set(shell.getLocation());
-
 			});
 		} else {
-			if (embeddedParent.isDisposed() == false) {
+			if(embeddedParent.isDisposed() == false) {
 				Display.getDefault().syncExec(() -> {
-
 					p.set(embeddedParent.toDisplay(embeddedParent.getLocation()));
-
 				});
 			}
 		}
 		Point point = p.get();
-		if (point == null) {
+		if(point == null) {
 			return new Point(0, 0);
 		}
 		return point;
@@ -192,11 +181,9 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public void setLocation(Point p) {
 
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				shell.setLocation(p);
-
 			});
 		}
 	}
@@ -204,7 +191,7 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public Point getSize() {
 
-		if (embeddedParent != null) {
+		if(embeddedParent != null) {
 			return null;
 		}
 		AtomicReference<Point> size = new AtomicReference<Point>();
@@ -222,7 +209,7 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public Point getShellSize() {
 
-		if (shell == null) {
+		if(shell == null) {
 			return null;
 		}
 		AtomicReference<Point> size = new AtomicReference<Point>();
@@ -254,9 +241,7 @@ public class ImageWindow implements MouseWheelListener {
 
 		AtomicReference<Rectangle> rec = new AtomicReference<Rectangle>();
 		Display.getDefault().syncExec(() -> {
-
 			rec.set(parentComposite.getBounds());
-
 		});
 		return rec.get();
 	}
@@ -269,11 +254,9 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public void setShellSize(Point p) {
 
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				shell.setSize(p);
-
 			});
 		}
 	}
@@ -281,11 +264,9 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public void toFront() {
 
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				shell.forceActive();
-
 			});
 		}
 	}
@@ -293,11 +274,9 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public void setSize(int x, int y) {
 
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				shell.setSize(x, y);
-
 			});
 		}
 	}
@@ -305,11 +284,9 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public void validate() {
 
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				shell.layout(true);
-
 			});
 		}
 	}
@@ -317,11 +294,9 @@ public class ImageWindow implements MouseWheelListener {
 	/* Compatibility methods since we have no Frame here! */
 	public void pack() {
 
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-
 				shell.pack(true);
-
 			});
 		}
 	}
@@ -372,7 +347,7 @@ public class ImageWindow implements MouseWheelListener {
 		boolean openAsHyperStack = imp.getOpenAsHyperStack();
 		embeddedParent = imp.getEditorParent();
 		/* We create a shell if we don't have another parent! */
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			createShell();
 		}
 		/*
@@ -380,9 +355,8 @@ public class ImageWindow implements MouseWheelListener {
 		 * embedded and then embed it in a given parent (editor, view, etc.)!
 		 */
 		createMainComposite(imp, embeddedParent);
-		if (ic == null) {
-			ic = (this instanceof PlotWindow) ? new PlotCanvas(parentComposite, imp)
-					: new ImageCanvas(parentComposite, imp);
+		if(ic == null) {
+			ic = (this instanceof PlotWindow) ? new PlotCanvas(parentComposite, imp) : new ImageCanvas(parentComposite, imp);
 			newCanvas = true;
 		}
 		/*
@@ -392,10 +366,10 @@ public class ImageWindow implements MouseWheelListener {
 		else {
 			ic.setParent(parentComposite);
 		}
-		if (ic.isDisposed() == false) {
+		if(ic.isDisposed() == false) {
 			ic.setLayoutData(gd_composite);
 			// ic.fitToWindow();
-			if (embeddedParent == null) {
+			if(embeddedParent == null) {
 				shell.setText(imp.getTitle());
 			}
 		}
@@ -408,8 +382,8 @@ public class ImageWindow implements MouseWheelListener {
 		// Rectangle max = Display.getDefault().getPrimaryMonitor().getBounds();
 		// super(title);
 		// super(imp.getTitle());
-		if (SCALE > 1.0) {
-			TEXT_GAP = (int) (TEXT_GAP * SCALE);
+		if(SCALE > 1.0) {
+			TEXT_GAP = (int)(TEXT_GAP * SCALE);
 			textGap = centerOnScreen ? 0 : TEXT_GAP;
 		}
 		/*
@@ -425,36 +399,36 @@ public class ImageWindow implements MouseWheelListener {
 		 * setFocusTraversalKeysEnabled(false); if (!(this instanceof StackWindow))
 		 * addMouseWheelListener(this); setResizable(true);
 		 */
-		if (!(this instanceof HistogramWindow && IJ.isMacro() && Interpreter.isBatchMode())) {
+		if(!(this instanceof HistogramWindow && IJ.isMacro() && Interpreter.isBatchMode())) {
 			WindowManager.addWindow(this);
 			imp.setWindow(this);
 		}
-		if (previousWindow != null) {
-			if (newCanvas)
+		if(previousWindow != null) {
+			if(newCanvas)
 				setLocationAndSize(false);
 			else
 				ic.update(previousWindow.getCanvas());
 			// Point loc = previousWindow.getLocation();
 			// setLocation(loc.x, loc.y);
-			if (!(this instanceof StackWindow || this instanceof PlotWindow)) { // layout now unless components will be
-				if (IJ.isMacro())
+			if(!(this instanceof StackWindow || this instanceof PlotWindow)) { // layout now unless components will be
+				if(IJ.isMacro())
 					imp.setDeactivated(); // prepare for waitTillActivated (imp may have been activated before if it
 											// gets a new Window now)
-				if (embeddedParent == null) {
+				if(embeddedParent == null) {
 					shell.setText(imp.getTitle());
 					shell.setSize(600, 600);
 					shell.layout();
 					shell.open();
 				}
-				if (ic.isDisposed() == false) {
+				if(ic.isDisposed() == false) {
 					ic.setLayoutData(gd_composite);
-					if (this.getCanvas().isFitToParent() == false) {
+					if(this.getCanvas().isFitToParent() == false) {
 						ic.fitToWindow();
 						ic.parent.layout();
 					}
 				}
 			}
-			if (ic.getMagnification() != 0.0)
+			if(ic.getMagnification() != 0.0)
 				imp.setTitle(imp.getTitle());
 			boolean unlocked = imp.lockSilently();
 			boolean changes = imp.changes;
@@ -463,56 +437,56 @@ public class ImageWindow implements MouseWheelListener {
 			// ic.setParent(parentComposite);
 			previousWindow.close(false);
 			imp.changes = changes;
-			if (unlocked)
+			if(unlocked)
 				imp.unlock();
-			if (this.imp != null)
+			if(this.imp != null)
 				this.imp.setOpenAsHyperStack(openAsHyperStack);
 			WindowManager.setCurrentWindow(this);
 		} else {
 			setLocationAndSize(false);
-			if (ij != null && !IJ.isMacintosh()) {
-				if (embeddedParent == null) {
+			if(ij != null && !IJ.isMacintosh()) {
+				if(embeddedParent == null) {
 					org.eclipse.swt.graphics.Image img = ij.getShell().getImage();
-					if (img != null)
+					if(img != null)
 						try {
 							shell.setImage(img);
-						} catch (Exception e) {
+						} catch(Exception e) {
 						}
 				}
 			}
-			if (nextLocation != null)
+			if(nextLocation != null)
 				setLocation(nextLocation);
-			else if (centerOnScreen)
+			else if(centerOnScreen)
 				GUI.center(this.getShell());
 			nextLocation = null;
 			centerOnScreen = false;
-			if (Interpreter.isBatchMode() || (IJ.getInstance() == null && this instanceof HistogramWindow)) {
+			if(Interpreter.isBatchMode() || (IJ.getInstance() == null && this instanceof HistogramWindow)) {
 				WindowManager.setTempCurrentImage(imp);
 				Interpreter.addBatchModeImage(imp);
 			} else {
-				if (IJ.isMacro())
+				if(IJ.isMacro())
 					imp.setDeactivated(); // prepare for waitTillActivated (imp may have been activated previously and
 											// gets a new Window now)
 				// show();
-				if (embeddedParent == null) {
+				if(embeddedParent == null) {
 					// if (!(this instanceof StackWindow)) {
 					shell.setText(imp.getTitle());
 					shell.setSize(600, 600);
 					shell.open();
-					if (ic.isDisposed() == false) {
+					if(ic.isDisposed() == false) {
 						ic.setLayoutData(gd_composite);
 						/* Stretch to parent composite? */
-						if (this.getCanvas().isFitToParent() == false) {
+						if(this.getCanvas().isFitToParent() == false) {
 							ic.fitToWindow();
 						}
 						shell.layout();
 					}
 				} else {
-					if (ic.isDisposed() == false) {
+					if(ic.isDisposed() == false) {
 						ic.setLayoutData(gd_composite);
 						embeddedParent.layout();
 						/* Stretch to parent composite? */
-						if (this.getCanvas().isFitToParent() == false) {
+						if(this.getCanvas().isFitToParent() == false) {
 							ic.fitToWindow();
 						}
 					}
@@ -527,7 +501,6 @@ public class ImageWindow implements MouseWheelListener {
 		// display = new Display();
 		/* A subshell from a default display in the ImageJ class! */
 		Display.getDefault().syncExec(() -> {
-
 			shell = new Shell(Display.getDefault());
 			shell.addListener(SWT.Close, new Listener() {
 
@@ -535,13 +508,13 @@ public class ImageWindow implements MouseWheelListener {
 
 					event.doit = false;
 					boolean closeIt = ImageWindow.this.close();
-					if (closeIt == false) {
+					if(closeIt == false) {
 						return;
 					}
 					/* Save the ImageJ preferences when the view is closed! */
 					try {
 						Prefs.savePreferences();
-					} catch (RuntimeException ex) {
+					} catch(RuntimeException ex) {
 						ex.printStackTrace();
 					}
 					event.doit = true;
@@ -571,7 +544,6 @@ public class ImageWindow implements MouseWheelListener {
 			shell.setLayout(layout);
 			layout.verticalSpacing = 0;
 			shell.setText("Image Viewer");
-
 		});
 	}
 
@@ -586,19 +558,19 @@ public class ImageWindow implements MouseWheelListener {
 			@Override
 			public void focusGained(org.eclipse.swt.events.FocusEvent e) {
 
-				if (IJ.debugMode)
+				if(IJ.debugMode)
 					IJ.log("windowActivated: " + imp.getTitle());
-				if (IJ.isMacOSX())
+				if(IJ.isMacOSX())
 					setImageJMenuBar(ImageWindow.this);
-				if (imp == null)
+				if(imp == null)
 					return;
 				ImageJ ij = IJ.getInstance();
-				if (ij != null && !closed && !ij.quitting() && !Interpreter.isBatchMode())
+				if(ij != null && !closed && !ij.quitting() && !Interpreter.isBatchMode())
 					WindowManager.setCurrentWindow(ImageWindow.this);
 				Roi roi = imp.getRoi();
-				if (roi != null && (roi instanceof PointRoi))
+				if(roi != null && (roi instanceof PointRoi))
 					PointToolOptions.update();
-				if (imp.isComposite())
+				if(imp.isComposite())
 					Channels.updateChannels();
 				imp.setActivated(); // notify ImagePlus that image has been activated
 			}
@@ -629,7 +601,7 @@ public class ImageWindow implements MouseWheelListener {
 			}
 		};
 		/* If we have no editor composite parent or view parent we create a shell! */
-		if (embeddedParent == null) {
+		if(embeddedParent == null) {
 			infoLabel = new Label(shell, SWT.NONE);
 			// infoLabel.setBackground(white);
 			infoLabel.addPaintListener(paintEvent -> {
@@ -679,25 +651,25 @@ public class ImageWindow implements MouseWheelListener {
 		// ImageWindow.this.ic.setSize(width, height);
 		// parentComposite.redraw();
 		/* Stretch to parent composite? */
-		if (this.getCanvas().isFitToParent()) {
+		if(this.getCanvas().isFitToParent()) {
 			gd_composite.widthHint = parentComposite.getSize().x;
 			gd_composite.heightHint = parentComposite.getSize().y;
 		}
 		/* Adjust the layout boundaries to center the image in the parent composite! */
 		else {
 			ImageWindow.this.ic.resizeCanvas(width, height);
-			gd_composite.widthHint = (int) (imp.getWidth() * ic.magnification);
-			gd_composite.heightHint = (int) (imp.getHeight() * ic.magnification);
+			gd_composite.widthHint = (int)(imp.getWidth() * ic.magnification);
+			gd_composite.heightHint = (int)(imp.getHeight() * ic.magnification);
 		}
 		// Call layout for size calculation!
 		parentComposite.layout();
 		int ids[] = WindowManager.getIDList();
-		if (ids != null) {
-			for (int i = 0; i < ids.length; i++) {
+		if(ids != null) {
+			for(int i = 0; i < ids.length; i++) {
 				ImagePlus ip = WindowManager.getImage(ids[i]);
 				// JPanel panel=(JPanel)win.getCanvas().getParent();
-				if (ip.getWindow() instanceof PlotWindow) {
-					if (ip.getID() == imp.getID())
+				if(ip.getWindow() instanceof PlotWindow) {
+					if(ip.getID() == imp.getID())
 						plotWindowResize(ip.getWindow());
 				}
 			}
@@ -706,12 +678,12 @@ public class ImageWindow implements MouseWheelListener {
 
 	private void plotWindowResize(ImageWindow win) {
 
-		if (win instanceof PlotWindow) {
-			PlotWindow plo = (PlotWindow) win;
-			if (plo != null) {
+		if(win instanceof PlotWindow) {
+			PlotWindow plo = (PlotWindow)win;
+			if(plo != null) {
 				Rectangle rec = parentComposite.getClientArea();
 				Plot plot = plo.getPlot();
-				if (plot != null) {
+				if(plot != null) {
 					int correctionX = plot.leftMargin + plot.rightMargin;
 					int correctionY = plot.topMargin + plot.bottomMargin;
 					plot.getImagePlus().getCanvas().setSize(rec.width + correctionX, rec.height + correctionY);
@@ -735,10 +707,10 @@ public class ImageWindow implements MouseWheelListener {
 	private void setLocationAndSize(boolean updating) {
 
 		/* If we have no shell return! */
-		if (embeddedParent != null) {
+		if(embeddedParent != null) {
 			return;
 		}
-		if (imp == null)
+		if(imp == null)
 			return;
 		int width = imp.getWidth();
 		int height = imp.getHeight();
@@ -746,37 +718,34 @@ public class ImageWindow implements MouseWheelListener {
 		Point loc = null;
 		// load preferences file location
 		java.awt.Point locTemp = Prefs.getLocation(LOC_KEY);
-		if (locTemp != null) {
+		if(locTemp != null) {
 			loc = new Point(locTemp.x, locTemp.y);
 			bounds = GUI.getMaxWindowBounds(loc);
-			if (bounds != null && (loc.x > bounds.x + bounds.width / 3 || loc.y > bounds.y + bounds.height / 3)
-					&& (loc.x + width > bounds.x + bounds.width || loc.y + height > bounds.y + bounds.height)) {
+			if(bounds != null && (loc.x > bounds.x + bounds.width / 3 || loc.y > bounds.y + bounds.height / 3) && (loc.x + width > bounds.x + bounds.width || loc.y + height > bounds.y + bounds.height)) {
 				loc = null;
 				bounds = null;
 			}
 		}
 		// if loc not valid, use screen bounds of visible window (this) or of main
 		// window (ij) if not visible yet (updating == false)
-		java.awt.Rectangle maxWindowTemp = bounds != null ? bounds
-				: GUI.getMaxWindowBounds(updating ? this.getShell() : ij.getShell());
-		Rectangle maxWindow = new Rectangle(maxWindowTemp.x, maxWindowTemp.y, maxWindowTemp.width,
-				maxWindowTemp.height);
-		if (WindowManager.getWindowCount() <= 1)
+		java.awt.Rectangle maxWindowTemp = bounds != null ? bounds : GUI.getMaxWindowBounds(updating ? this.getShell() : ij.getShell());
+		Rectangle maxWindow = new Rectangle(maxWindowTemp.x, maxWindowTemp.y, maxWindowTemp.width, maxWindowTemp.height);
+		if(WindowManager.getWindowCount() <= 1)
 			xbase = -1;
-		if (width > maxWindow.width / 2 && xbase > maxWindow.x + 5 + XINC * 6)
+		if(width > maxWindow.width / 2 && xbase > maxWindow.x + 5 + XINC * 6)
 			xbase = -1;
-		if (xbase == -1) {
+		if(xbase == -1) {
 			count = 0;
-			if (loc != null) {
+			if(loc != null) {
 				xbase = loc.x;
 				ybase = loc.y;
-			} else if (ij != null) {
+			} else if(ij != null) {
 				Rectangle ijBounds = ij.getBounds();
-				if (ijBounds.y - maxWindow.x < maxWindow.height / 8) {
+				if(ijBounds.y - maxWindow.x < maxWindow.height / 8) {
 					xbase = ijBounds.x;
-					if (xbase + width > maxWindow.x + maxWindow.width) {
+					if(xbase + width > maxWindow.x + maxWindow.width) {
 						xbase = maxWindow.x + maxWindow.width - width - 10;
-						if (xbase < maxWindow.x)
+						if(xbase < maxWindow.x)
 							xbase = maxWindow.x + 5;
 						;
 					}
@@ -800,30 +769,30 @@ public class ImageWindow implements MouseWheelListener {
 		xloc += XINC;
 		yloc += YINC;
 		count++;
-		if (count % 6 == 0) {
+		if(count % 6 == 0) {
 			xloc = xbase;
 			yloc = ybase;
 		}
 		screenHeight = maxWindow.y + maxWindow.height - sliderHeight;
 		screenWidth = maxWindow.x + maxWindow.width;
 		double mag = 1;
-		if (!(this instanceof PlotWindow)) { // unless a plot (always at 100%), zoom out to show all of image
-			while (xbase + width * mag > screenWidth || ybase + height * mag >= screenHeight) {
+		if(!(this instanceof PlotWindow)) { // unless a plot (always at 100%), zoom out to show all of image
+			while(xbase + width * mag > screenWidth || ybase + height * mag >= screenHeight) {
 				double mag2 = ImageCanvas.getLowerZoomLevel(mag);
-				if (mag2 == mag)
+				if(mag2 == mag)
 					break;
 				mag = mag2;
 			}
 		}
-		if (mag < 1.0) {
+		if(mag < 1.0) {
 			initialMagnification = mag;
-			ic.setSize((int) (width * mag), (int) (height * mag));
+			ic.setSize((int)(width * mag), (int)(height * mag));
 		}
 		ic.setMagnification(mag);
-		if (y + height * mag > screenHeight)
+		if(y + height * mag > screenHeight)
 			y = ybase;
-		if (Prefs.open100Percent && ic.getMagnification() < 1.0) {
-			while (ic.getMagnification() < 1.0)
+		if(Prefs.open100Percent && ic.getMagnification() < 1.0) {
+			while(ic.getMagnification() < 1.0)
 				ic.zoomIn(0, 0);
 			setSize(Math.min(width, screenWidth - x), Math.min(height, screenHeight - y));
 			validate();
@@ -831,7 +800,7 @@ public class ImageWindow implements MouseWheelListener {
 			// pack (shell.pack() will cause a stackoverflow because the plotWindowResize
 			// will be called which calls this function!
 			// pack();
-		if (!updating)
+		if(!updating)
 			setLocation(x, y);
 	}
 
@@ -871,12 +840,12 @@ public class ImageWindow implements MouseWheelListener {
 	/** Draws the subtitle. */
 	public void drawInfo(GC gc) {
 
-		if (imp == null)
+		if(imp == null)
 			return;
-		if (textGap != 0) { // Insets insets = super.getInsets();
-			if (imp.isComposite()) {
-				CompositeImage ci = (CompositeImage) imp;
-				if (ci.getMode() == IJ.COMPOSITE) {
+		if(textGap != 0) { // Insets insets = super.getInsets();
+			if(imp.isComposite()) {
+				CompositeImage ci = (CompositeImage)imp;
+				if(ci.getMode() == IJ.COMPOSITE) {
 					org.eclipse.swt.graphics.Color c = ci.getChannelColor();
 					// if (Color.green.equals(c))
 					// c = new Color(0, 180, 0);
@@ -896,97 +865,95 @@ public class ImageWindow implements MouseWheelListener {
 	public String createSubtitle() {
 
 		String s = "";
-		if (imp == null)
+		if(imp == null)
 			return s;
 		int stackSize = imp.getStackSize();
-		if (stackSize > 1) {
+		if(stackSize > 1) {
 			ImageStack stack = imp.getStack();
 			int currentSlice = imp.getCurrentSlice();
 			s += currentSlice + "/" + stackSize;
 			String label = stack.getShortSliceLabel(currentSlice);
-			if (label != null && label.length() > 0) {
-				if (imp.isHyperStack())
+			if(label != null && label.length() > 0) {
+				if(imp.isHyperStack())
 					label = label.replace(';', ' ');
 				s += " (" + label + ")";
 			}
-			if ((this instanceof StackWindow) && running2) {
+			if((this instanceof StackWindow) && running2) {
 				return s;
 			}
 			s += "; ";
 		} else {
 			String label = imp.getProp("Slice_Label");
-			if (label == null && imp.hasImageStack())
+			if(label == null && imp.hasImageStack())
 				label = imp.getStack().getSliceLabel(1);
-			if (label != null && label.length() > 0) {
+			if(label != null && label.length() > 0) {
 				int newline = label.indexOf('\n');
-				if (newline > 0)
+				if(newline > 0)
 					label = label.substring(0, newline);
 				int len = label.length();
-				if (len > 4 && label.charAt(len - 4) == '.' && !Character.isDigit(label.charAt(len - 1)))
+				if(len > 4 && label.charAt(len - 4) == '.' && !Character.isDigit(label.charAt(len - 1)))
 					label = label.substring(0, len - 4);
-				if (label.length() > 60)
+				if(label.length() > 60)
 					label = label.substring(0, 60) + "...";
 				s = "\"" + label + "\"; ";
 			}
 		}
 		int type = imp.getType();
 		Calibration cal = imp.getCalibration();
-		if (cal.scaled()) {
+		if(cal.scaled()) {
 			boolean unitsMatch = cal.getXUnit().equals(cal.getYUnit());
 			double cwidth = imp.getWidth() * cal.pixelWidth;
 			double cheight = imp.getHeight() * cal.pixelHeight;
 			int digits = Tools.getDecimalPlaces(cwidth, cheight);
-			if (digits > 2)
+			if(digits > 2)
 				digits = 2;
-			if (unitsMatch) {
-				s += IJ.d2s(cwidth, digits) + "x" + IJ.d2s(cheight, digits) + " " + cal.getUnits() + " ("
-						+ imp.getWidth() + "x" + imp.getHeight() + "); ";
+			if(unitsMatch) {
+				s += IJ.d2s(cwidth, digits) + "x" + IJ.d2s(cheight, digits) + " " + cal.getUnits() + " (" + imp.getWidth() + "x" + imp.getHeight() + "); ";
 			} else {
-				s += d2s(cwidth) + " " + cal.getXUnit() + " x " + d2s(cheight) + " " + cal.getYUnit() + " ("
-						+ imp.getWidth() + "x" + imp.getHeight() + "); ";
+				s += d2s(cwidth) + " " + cal.getXUnit() + " x " + d2s(cheight) + " " + cal.getYUnit() + " (" + imp.getWidth() + "x" + imp.getHeight() + "); ";
 			}
 		} else
 			s += imp.getWidth() + "x" + imp.getHeight() + " pixels; ";
-		switch (type) {
-		case ImagePlus.GRAY8:
-		case ImagePlus.COLOR_256:
-			s += "8-bit";
-			break;
-		case ImagePlus.GRAY16:
-			s += "16-bit";
-			break;
-		case ImagePlus.GRAY32:
-			s += "32-bit";
-			break;
-		case ImagePlus.COLOR_RGB:
-			s += imp.isRGB() ? "RGB" : "32-bit (int)";
-			break;
+		switch(type) {
+			case ImagePlus.GRAY8:
+			case ImagePlus.COLOR_256:
+				s += "8-bit";
+				break;
+			case ImagePlus.GRAY16:
+				s += "16-bit";
+				break;
+			case ImagePlus.GRAY32:
+				s += "32-bit";
+				break;
+			case ImagePlus.COLOR_RGB:
+				s += imp.isRGB() ? "RGB" : "32-bit (int)";
+				break;
 		}
-		if (imp.isInvertedLut())
+		if(imp.isInvertedLut())
 			s += " (inverting LUT)";
 		return s + "; " + getImageSize(imp);
 	}
 
 	public static String getImageSize(ImagePlus imp) {
 
-		if (imp == null)
+		if(imp == null)
 			return null;
 		double size = imp.getSizeInBytes() / 1024.0;
 		String s2 = null, s3 = null;
-		if (size < 1024.0) {
+		if(size < 1024.0) {
 			s2 = IJ.d2s(size, 0);
 			s3 = "K";
-		} else if (size < 10000.0) {
+		} else if(size < 10000.0) {
 			s2 = IJ.d2s(size / 1024.0, 1);
 			s3 = "MB";
-		} else if (size < 1048576.0) {
+		} else if(size < 1048576.0) {
 			s2 = IJ.d2s(Math.round(size / 1024.0), 0);
 			s3 = "MB";
 		} else {
 			s2 = IJ.d2s(size / 1048576.0, 1);
 			s3 = "GB";
 		}
-		if (s2.endsWith(".0"))
+		if(s2.endsWith(".0"))
 			s2 = s2.substring(0, s2.length() - 2);
 		return s2 + s3;
 	}
@@ -994,7 +961,7 @@ public class ImageWindow implements MouseWheelListener {
 	private String d2s(double n) {
 
 		int digits = Tools.getDecimalPlaces(n);
-		if (digits > 2)
+		if(digits > 2)
 			digits = 2;
 		return IJ.d2s(n, digits);
 	}
@@ -1018,73 +985,69 @@ public class ImageWindow implements MouseWheelListener {
 
 		boolean isRunning = running || running2;
 		running = running2 = false;
-		if (imp == null)
+		if(imp == null)
 			return true;
 		boolean virtual = imp.getStackSize() > 1 && imp.getStack().isVirtual();
-		if (isRunning)
+		if(isRunning)
 			IJ.wait(500);
-		if (imp == null)
+		if(imp == null)
 			return true;
 		boolean changes = imp.changes;
 		Roi roi = imp.getRoi();
-		if (roi != null && (roi instanceof PointRoi) && ((PointRoi) roi).promptBeforeDeleting())
+		if(roi != null && (roi instanceof PointRoi) && ((PointRoi)roi).promptBeforeDeleting())
 			changes = true;
-		if (ij == null || ij.quittingViaMacro() || IJ.getApplet() != null || Interpreter.isBatchMode()
-				|| IJ.macroRunning() || virtual)
+		if(ij == null || ij.quittingViaMacro() || IJ.getApplet() != null || Interpreter.isBatchMode() || IJ.macroRunning() || virtual)
 			changes = false;
-		if (changes) {
+		if(changes) {
 			String msg;
 			String name = imp.getTitle();
-			if (name.length() > 22)
+			if(name.length() > 22)
 				msg = "Save changes to\n" + "\"" + name + "\"?";
 			else
 				msg = "Save changes to \"" + name + "\"?";
-			if (imp.isLocked())
+			if(imp.isLocked())
 				msg += "\nWARNING: This image is locked.\nProbably, processing is unfinished (slow or still previewing).";
 			// toFront();
-			if (embeddedParent == null) {
-				if (shell != null && !shell.isDisposed()) {
+			if(embeddedParent == null) {
+				if(shell != null && !shell.isDisposed()) {
 					shell.forceActive();
 				}
 				YesNoCancelDialog d = new YesNoCancelDialog("ImageJ", msg);
-				if (d.cancelPressed())
+				if(d.cancelPressed())
 					return false;
-				else if (d.yesPressed()) {
+				else if(d.yesPressed()) {
 					ij.io.FileSaver fs = new ij.io.FileSaver(imp);
-					if (!fs.save())
+					if(!fs.save())
 						return false;
 				}
 			}
 		}
 		closed = true;
-		if (WindowManager.getWindowCount() == 0) {
+		if(WindowManager.getWindowCount() == 0) {
 			xloc = 0;
 			yloc = 0;
 		}
 		WindowManager.removeWindow(this);
-		if (ij != null && ij.quitting()) // this may help avoid thread deadlocks
+		if(ij != null && ij.quitting()) // this may help avoid thread deadlocks
 			return true;
 		Display.getDefault().syncExec(() -> {
-
 			Rectangle bounds = getBounds();
 			// dispose();
-			if (embeddedParent == null) {
-				if (!IJ.isMacro() && bounds.y < screenHeight / 3 && (bounds.y + bounds.height) <= screenHeight
-						&& (bounds.x + bounds.width) <= screenWidth) {
+			if(embeddedParent == null) {
+				if(!IJ.isMacro() && bounds.y < screenHeight / 3 && (bounds.y + bounds.height) <= screenHeight && (bounds.x + bounds.width) <= screenWidth) {
 					Prefs.saveLocation(LOC_KEY, new Point(bounds.x, bounds.y));
 					xbase = -1;
 				}
-				if (disposeShell) {
+				if(disposeShell) {
 					shell.dispose();
 				} else {
 					// Will be opened again when an image is replaced (e.g., RGB to RGB stack)
 					shell.setVisible(false);
 				}
 			}
-			if (imp != null)
+			if(imp != null)
 				imp.flush();
 			imp = null;
-
 		});
 		return true;
 	}
@@ -1097,7 +1060,7 @@ public class ImageWindow implements MouseWheelListener {
 	public void setImage(ImagePlus imp2) {
 
 		ImageCanvas ic = getCanvas();
-		if (ic == null || imp2 == null)
+		if(ic == null || imp2 == null)
 			return;
 		imp = imp2;
 		imp.setWindow(this);
@@ -1109,23 +1072,22 @@ public class ImageWindow implements MouseWheelListener {
 
 	public void updateImage(ImagePlus imp) {
 
-		if (imp != this.imp)
+		if(imp != this.imp)
 			throw new IllegalArgumentException("imp!=this.imp");
 		this.imp = imp;
 		ic.updateImage(imp);
 		setLocationAndSize(true);
-		if (this instanceof StackWindow) {
-			StackWindow sw = (StackWindow) this;
+		if(this instanceof StackWindow) {
+			StackWindow sw = (StackWindow)this;
 			int stackSize = imp.getStackSize();
 			int nScrollbars = sw.getNScrollbars();
-			if (stackSize == 1 && nScrollbars > 0)
+			if(stackSize == 1 && nScrollbars > 0)
 				sw.removeScrollbars();
-			else if (stackSize > 1 && nScrollbars == 0)
+			else if(stackSize > 1 && nScrollbars == 0)
 				sw.addScrollbars(imp);
 		}
 		Display display = Display.getDefault();
-		display.syncExec(() -> {
-
+		display.asyncExec(() -> {
 			gd_composite.widthHint = imp.getWidth();
 			gd_composite.heightHint = imp.getHeight();
 			ImageWindow.this.ic.redraw();
@@ -1135,19 +1097,14 @@ public class ImageWindow implements MouseWheelListener {
 			maxBounds = getMaximumBounds();
 			// setMaximizedBounds(maxBounds);
 			setMaxBoundsTime = System.currentTimeMillis();
-
 		});
-		if (embeddedParent != null) {
+		if(embeddedParent != null) {
 			display.syncExec(() -> {
-
 				embeddedParent.layout();
-
 			});
 		} else {
 			display.syncExec(() -> {
-
 				shell.layout();
-
 			});
 		}
 	}
@@ -1207,29 +1164,25 @@ public class ImageWindow implements MouseWheelListener {
 	public void maximize() {
 
 		Display.getDefault().syncExec(() -> {
-
-			if (GenericDialog.getInstance() != null && IJ.isMacOSX() && IJ.isJava18())
+			if(GenericDialog.getInstance() != null && IJ.isMacOSX() && IJ.isJava18())
 				return; // workaround for OSX/Java 8 maximize bug
 			Rectangle rect = getMaximumBounds();
-			if (IJ.debugMode)
+			if(IJ.debugMode)
 				IJ.log("maximize: " + rect);
 			setLocationAndSize(rect.x, rect.y, rect.width, rect.height);
 			resizeControl();
-
 		});
 	}
 
 	public void minimize() {
 
 		Display.getDefault().syncExec(() -> {
-
-			if (IJ.debugMode)
+			if(IJ.debugMode)
 				IJ.log("minimize: " + unzoomWhenMinimizing);
-			if (unzoomWhenMinimizing)
+			if(unzoomWhenMinimizing)
 				ic.unzoom();
 			unzoomWhenMinimizing = true;
 			resizeControl();
-
 		});
 	}
 
@@ -1241,7 +1194,7 @@ public class ImageWindow implements MouseWheelListener {
 
 	public void focusGained(FocusEvent e) {
 
-		if (!Interpreter.isBatchMode() && ij != null && !ij.quitting() && imp != null) {
+		if(!Interpreter.isBatchMode() && ij != null && !ij.quitting() && imp != null) {
 			// if (IJ.debugMode) IJ.log("focusGained: "+imp);
 			WindowManager.setCurrentWindow(this);
 		}
@@ -1249,28 +1202,28 @@ public class ImageWindow implements MouseWheelListener {
 
 	public void windowActivated(WindowEvent e) {
 
-		if (IJ.debugMode)
+		if(IJ.debugMode)
 			IJ.log("windowActivated: " + imp.getTitle());
-		if (IJ.isMacOSX() && Prefs.setIJMenuBar && !IJ.isMacro())
+		if(IJ.isMacOSX() && Prefs.setIJMenuBar && !IJ.isMacro())
 			setImageJMenuBar(this);
-		if (imp == null)
+		if(imp == null)
 			return;
 		ImageJ ij = IJ.getInstance();
-		if (ij != null && !closed && !ij.quitting() && !Interpreter.isBatchMode())
+		if(ij != null && !closed && !ij.quitting() && !Interpreter.isBatchMode())
 			WindowManager.setCurrentWindow(this);
 		Roi roi = imp.getRoi();
-		if (roi != null && (roi instanceof PointRoi))
+		if(roi != null && (roi instanceof PointRoi))
 			PointToolOptions.update();
-		if (imp.isComposite())
+		if(imp.isComposite())
 			Channels.updateChannels();
 		imp.setActivated(); // notify ImagePlus that image has been activated
 	}
 
 	public void windowClosing(WindowEvent e) {
 
-		if (closed)
+		if(closed)
 			return;
-		if (ij != null) {
+		if(ij != null) {
 			WindowManager.setCurrentWindow(this);
 			IJ.doCommand("Close");
 		} else {
@@ -1283,9 +1236,9 @@ public class ImageWindow implements MouseWheelListener {
 
 		int oldState = e.getOldState();
 		int newState = e.getNewState();
-		if (IJ.debugMode)
+		if(IJ.debugMode)
 			IJ.log("windowStateChanged: " + oldState + " " + newState);
-		if ((oldState & Frame.MAXIMIZED_BOTH) == 0 && (newState & Frame.MAXIMIZED_BOTH) != 0)
+		if((oldState & Frame.MAXIMIZED_BOTH) == 0 && (newState & Frame.MAXIMIZED_BOTH) != 0)
 			maximize();
 	}
 
@@ -1413,23 +1366,19 @@ public class ImageWindow implements MouseWheelListener {
 	public void setLocationAndSize(int x, int y, int width, int height) {
 
 		Display.getDefault().syncExec(() -> {
-
-			if (shell != null && shell.isDisposed() == false) {
+			if(shell != null && shell.isDisposed() == false) {
 				shell.setLocation(x, y);
 				shell.setSize(width, height);
 				getCanvas().fitToWindow();
 			}
-
 		});
 	}
 
 	public void setLocation(int x, int y) {
 
 		Display.getDefault().syncExec(() -> {
-
-			if (shell != null && shell.isDisposed() == false)
+			if(shell != null && shell.isDisposed() == false)
 				shell.setLocation(x, y);
-
 		});
 		/*
 		 * super.setLocation(x, y); initialLoc = null;
@@ -1451,35 +1400,33 @@ public class ImageWindow implements MouseWheelListener {
 		ImageJ ij = IJ.getInstance();
 		boolean setMenuBar = true;
 		ImagePlus imp = win.getImagePlus();
-		if (imp != null)
+		if(imp != null)
 			setMenuBar = imp.setIJMenuBar();
 		Menu mb = Menus.getMenuBar();
 		/* if (mb!=null && mb==win.getMenuBar()) */
 		setMenuBar = false;
 		setMenuBarTime = 0L;
-		if (setMenuBar && ij != null && !ij.quitting()) {
+		if(setMenuBar && ij != null && !ij.quitting()) {
 			IJ.wait(10); // may be needed for Java 1.4 on OS X
 			long t0 = System.currentTimeMillis();
 			// win.setMenuBar(mb);
 			long time = System.currentTimeMillis() - t0;
 			setMenuBarTime = time;
 			Menus.setMenuBarCount++;
-			if (time > 2000L)
+			if(time > 2000L)
 				Prefs.setIJMenuBar = false;
 		}
-		if (imp != null)
+		if(imp != null)
 			imp.setIJMenuBar(true);
 	}
 
 	/* For SWT compatibility! */
 	public void repaint() {
 
-		Display.getDefault().syncExec(() -> {
-
-			if (infoLabel != null && !infoLabel.isDisposed()) {
+		Display.getDefault().asyncExec(() -> {
+			if(infoLabel != null && !infoLabel.isDisposed()) {
 				infoLabel.redraw();
 			}
-
 		});
 		getCanvas().setImageUpdated();
 	}

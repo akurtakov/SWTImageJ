@@ -2331,7 +2331,7 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 		Display.getDefault().syncExec(() -> {
 			ta.setSelection(debugStart, debugEnd);
 		});
-		if(debugWindow != null && !debugWindow.isVisible()) {
+		if(debugWindow != null && !debugWindow.isShellVisible()) {
 			interp.setDebugger(null);
 			debugWindow = null;
 		} else

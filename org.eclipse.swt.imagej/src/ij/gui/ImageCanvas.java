@@ -378,7 +378,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	/* For SWT compatibility! */
 	public void repaint() {
 
-		Display.getDefault().syncExec(() -> {
+		Display.getDefault().asyncExec(() -> {
 			if(ImageCanvas.this.isDisposed() == false)
 				redraw();
 		});
@@ -387,9 +387,25 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 	/* For SWT compatibility! */
 	public void repaint(int x, int y, int width, int height) {
 
-		Display.getDefault().syncExec(() -> {
+		Display.getDefault().asyncExec(() -> {
 			if(ImageCanvas.this.isDisposed() == false)
 				redraw(x, y, width, height, false);
+		});
+	}
+
+	public void redraw() {
+
+		Display.getDefault().asyncExec(() -> {
+			if(ImageCanvas.this.isDisposed() == false)
+				super.redraw();
+		});
+	}
+
+	public void redraw(int x, int y, int width, int height) {
+
+		Display.getDefault().asyncExec(() -> {
+			if(ImageCanvas.this.isDisposed() == false)
+				super.redraw(x, y, width, height, false);
 		});
 	}
 

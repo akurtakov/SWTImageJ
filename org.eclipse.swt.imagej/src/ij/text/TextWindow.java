@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -676,5 +677,19 @@ public class TextWindow implements WindowSwt, SelectionListener, ShellListener, 
 	public void shellIconified(ShellEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public boolean isShellVisible() {
+
+		AtomicReference<Boolean> visible = new AtomicReference<Boolean>();
+		Display.getDefault().syncExec(() -> {
+			Shell shell = getShell();
+			if(shell != null && !shell.isDisposed()) {
+				visible.set(shell.isVisible());
+			} else {
+				visible.set(false);
+			}
+		});
+		return visible.get();
 	}
 }
