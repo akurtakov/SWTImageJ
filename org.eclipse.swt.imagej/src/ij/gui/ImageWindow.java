@@ -266,7 +266,7 @@ public class ImageWindow implements MouseWheelListener {
 
 		if(embeddedParent == null) {
 			Display.getDefault().syncExec(() -> {
-				shell.forceActive();
+				shell.setActive();
 			});
 		}
 	}
@@ -1010,7 +1010,7 @@ public class ImageWindow implements MouseWheelListener {
 			// toFront();
 			if(embeddedParent == null) {
 				if(shell != null && !shell.isDisposed()) {
-					shell.forceActive();
+					shell.setActive();
 				}
 				YesNoCancelDialog d = new YesNoCancelDialog("ImageJ", msg);
 				if(d.cancelPressed())

@@ -2298,7 +2298,7 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 		if(win != this)
 			IJ.wait(50);
 		Display.getDefault().syncExec(() -> {
-			getShell().forceActive();
+			getShell().setActive();
 		});
 		previousLine = n;
 		Display.getDefault().syncExec(() -> {
@@ -2339,7 +2339,7 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 		if(debugWindow != null) {
 			interp.updateArrayInspector();
 			Display.getDefault().syncExec(() -> {
-				getShell().forceActive();
+				getShell().setActive();
 			});
 		}
 		if(mode == STEP) {
@@ -2395,9 +2395,9 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 		Object log = WindowManager.getWindow("Log");
 		if(log != null) {
 			if(log instanceof Shell) {
-				((Shell)log).forceActive();
+				((Shell)log).setActive();
 			} else if(log instanceof WindowSwt) {
-				((WindowSwt)log).getShell().forceActive();
+				((WindowSwt)log).getShell().setActive();
 			}
 		} else
 			IJ.log("");

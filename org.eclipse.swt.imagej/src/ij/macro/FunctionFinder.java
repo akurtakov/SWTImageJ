@@ -121,7 +121,7 @@ public class FunctionFinder implements org.eclipse.swt.events.ModifyListener, Se
 		int initialY = (int)posi.y + 84;
 		dialog.setLocation(initialX, initialY);
 		dialog.setVisible(true);
-		dialog.forceActive();
+		dialog.setActive();
 	}
 
 	public FunctionFinder() {
@@ -192,7 +192,7 @@ public class FunctionFinder implements org.eclipse.swt.events.ModifyListener, Se
 			}
 		}
 		if(editor != null)
-			editor.getShell().forceActive();
+			editor.getShell().setActive();
 	}
 
 	public void keyPressed(KeyEvent ke) {
