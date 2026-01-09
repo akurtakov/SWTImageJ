@@ -805,7 +805,6 @@ public class CommandFinder implements WindowSwt, PlugIn, SelectionListener, Shel
 			shell.setLocation(initialX, initialY);
 			// shell.setVisible(true);
 			shell.open();
-			// shell.forceActive();
 		});
 	}
 
