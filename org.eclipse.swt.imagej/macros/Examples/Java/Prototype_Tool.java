@@ -3,22 +3,21 @@
 import ij.*;
 import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
 import ij.plugin.tool.PlugInTool;
-import java.awt.event.*;
+import org.eclipse.swt.events.*;
 
 public class Prototype_Tool extends PlugInTool {
 
-	public void mousePressed(ImagePlus imp, MouseEvent e) {
-		IJ.log("mouse pressed: "+e);
-	}
+    public void mouseDown(ImagePlus imp, MouseEvent e) {
+        IJ.log("mouse pressed: "+e);
+    }
 
-	public void mouseDragged(ImagePlus imp, MouseEvent e) {
-		IJ.log("mouse dragged: "+e);
-	}
+    public void mouseDragged(ImagePlus imp, MouseEvent e) {
+        IJ.log("mouse dragged: "+e);
+    }
 
-	public void showOptionsDialog() {
-		IJ.log("icon double-clicked");
-	}
+    public void showOptionsDialog() {
+        IJ.log("icon double-clicked");
+    }
 
 }

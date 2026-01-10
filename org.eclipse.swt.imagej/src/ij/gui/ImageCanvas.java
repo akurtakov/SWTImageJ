@@ -2599,7 +2599,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		// repaint();
 		/* SWT paint! */
 		if(ImageCanvas.this.isDisposed() == false)
-			Display.getDefault().syncExec(() -> {
+			Display.getDefault().asyncExec(() -> {
 				redraw();
 			});
 	}

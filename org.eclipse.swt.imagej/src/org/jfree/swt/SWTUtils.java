@@ -21,7 +21,9 @@
 package org.jfree.swt;
 
 import java.awt.Graphics;
+import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -171,6 +173,41 @@ public class SWTUtils {
 			tmpGC.dispose();
 		}
 		return new java.awt.Font(fontData.getName(), fontData.getStyle(), height);
+	}
+
+	public static java.awt.Font toAwtFont2(Device device, FontData fontData, boolean ensureSameSize) {
+
+		// Convert SWT style to AWT style
+		int awtStyle = java.awt.Font.PLAIN;
+		int swtStyle = fontData.getStyle();
+		if((swtStyle & SWT.BOLD) != 0) {
+			awtStyle |= java.awt.Font.BOLD;
+		}
+		if((swtStyle & SWT.ITALIC) != 0) {
+			awtStyle |= java.awt.Font.ITALIC;
+		}
+		float fontSize = fontData.getHeight();
+		if(ensureSameSize && device != null) {
+			// Adjust for DPI differences between SWT and AWT
+			fontSize = adjustFontSizeForDpi(device, fontSize);
+		}
+		// Create base font and derive final size
+		java.awt.Font baseFont = new java.awt.Font(fontData.getName(), awtStyle, 1);
+		return baseFont.deriveFont(fontSize);
+	}
+
+	private static float adjustFontSizeForDpi(Device device, float originalSize) {
+
+		try {
+			Point swtDpi = device.getDPI();
+			int awtDpi = Toolkit.getDefaultToolkit().getScreenResolution();
+			// Calculate size adjustment ratio
+			float ratio = (float)swtDpi.y / awtDpi;
+			return originalSize * ratio;
+		} catch(HeadlessException | NullPointerException e) {
+			// Fallback to original size if DPI info unavailable
+			return originalSize;
+		}
 	}
 
 	/**
