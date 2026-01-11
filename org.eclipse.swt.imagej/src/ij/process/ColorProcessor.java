@@ -70,7 +70,7 @@ public class ColorProcessor extends ImageProcessor {
 		height = data_.height;
 		pixels = new int[width * height];
 		org.eclipse.swt.graphics.Image imageScreen = new org.eclipse.swt.graphics.Image(Display.getDefault(), width, height);
-		/* Necessary for Mac to draw the screenshot else we get a white image! */
+		/* Necessary for Mac to draw else we get a white image! */
 		GC gc = new GC(imageScreen);
 		if(Util.getOS().equals("Mac")) {
 			gc.setAntialias(SWT.OFF);
