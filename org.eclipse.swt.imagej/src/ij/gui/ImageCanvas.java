@@ -467,6 +467,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 			}
 			SWTGraphics2D g = new SWTGraphics2D(gc);
 			setInterpolation(g, Prefs.interpolateScaledImages);
+			// setInterpolation(gc, Prefs.interpolateScaledImages);
 			if(img != null) {
 				if(fitToParent) {
 					gc.drawImage(img, srcRect.x, srcRect.y, srcRect.width, srcRect.height, 0, 0, width, height);
@@ -551,6 +552,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 			}
 			SWTGraphics2D g = new SWTGraphics2D(newGC);
 			setInterpolation(g, Prefs.interpolateScaledImages);
+			// setInterpolation(gc, Prefs.interpolateScaledImages);
 			// newGC.setClipping(this.getClientArea());
 			if(img != null) {
 				/*
@@ -610,6 +612,25 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseWheelList
 		} else if(magnification > 1.0) {
 			Object value = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 			((Graphics2D)g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, value);
+		}
+	}
+
+	public void setInterpolation(GC gc, boolean interpolate) {
+
+		if(magnification == 1.0) {
+			return;
+		}
+		gc.setAdvanced(true);
+		if(magnification < 1.0 || interpolate) {
+			gc.setInterpolation(SWT.HIGH);
+			gc.setAntialias(SWT.ON);
+			gc.setTextAntialias(SWT.ON);
+			return;
+		}
+		if(magnification > 1.0) {
+			gc.setInterpolation(SWT.NONE);
+			gc.setAntialias(SWT.OFF);
+			gc.setTextAntialias(SWT.OFF);
 		}
 	}
 
