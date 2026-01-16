@@ -202,12 +202,27 @@ public class ColorProcessor extends ImageProcessor {
 			// rgb.get(pixels);
 			/* Replaces the createColorModel method! */
 			ImageData currentImageData = new ImageData(width, height, 32, new PaletteData(0xFF0000, 0x00FF00, 0x0000FF));
+			currentImageData.alphaData = null;
 			currentImageData.setPixels(0, 0, width * height, pixels, 0);
 			// Constructs a new direct palette given the red, green and blue masks.
 			imageSwt = new org.eclipse.swt.graphics.Image(Display.getDefault(), currentImageData);
 		}
 		return imageSwt;
 	}
+	/*
+	 * ImageData currentImageData = new ImageData(width, height, 32, new PaletteData(0xFF0000, 0x00FF00, 0x0000FF));
+	 * currentImageData.alphaData = null;
+	 * // Direct byte-level manipulation
+	 * byte[] buffer = currentImageData.data;
+	 * IntStream.range(0, width * height).parallel().forEach(i -> {
+	 * int pixel = pixels[i];
+	 * int offset = i * 4;
+	 * buffer[offset] = (byte)((pixel & 0xFF0000) >> 16); // R
+	 * buffer[offset + 1] = (byte)((pixel & 0x00FF00) >> 8); // G
+	 * buffer[offset + 2] = (byte)(pixel & 0x0000FF); // B
+	 * // buffer[offset + 3] is Alpha if needed
+	 * });
+	 */
 
 	Image createBufferedImage() {
 
