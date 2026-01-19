@@ -424,29 +424,31 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 		} else
 			updateScrollBars(null, false);
 		if(balance) {
-			if(imp.isComposite()) {
-				int channel = imp.getChannel();
-				if(channel <= 4) {
-					choice.removeAll();
-					addBalanceChoices();
-					choice.select(channel - 1);
-					channels = channelConstants[channel - 1];
+			Display.getDefault().syncExec(() -> {
+				if(imp.isComposite()) {
+					int channel = imp.getChannel();
+					if(channel <= 4) {
+						choice.removeAll();
+						addBalanceChoices();
+						choice.select(channel - 1);
+						channels = channelConstants[channel - 1];
+					}
+					if(!choice.getItem(0).equals("Channel 1")) { // if the choice is wrong
+						choice.removeAll();
+						addBalanceChoices();
+					}
+				} else if((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32)) { // grey image
+					if(!choice.getItem(0).equals("LUT level")) { // if the choice is wrong
+						choice.removeAll();
+						addBalanceChoices();
+					}
+				} else { // not composite
+					if(!choice.getItem(0).equals("Red")) { // if the choice is wrong
+						choice.removeAll();
+						addBalanceChoices();
+					}
 				}
-				if(!choice.getItem(0).equals("Channel 1")) { // if the choice is wrong
-					choice.removeAll();
-					addBalanceChoices();
-				}
-			} else if((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32)) { // grey image
-				if(!choice.getItem(0).equals("LUT level")) { // if the choice is wrong
-					choice.removeAll();
-					addBalanceChoices();
-				}
-			} else { // not composite
-				if(!choice.getItem(0).equals("Red")) { // if the choice is wrong
-					choice.removeAll();
-					addBalanceChoices();
-				}
-			}
+			});
 		}
 		if(!doReset)
 			plotHistogram(imp);
