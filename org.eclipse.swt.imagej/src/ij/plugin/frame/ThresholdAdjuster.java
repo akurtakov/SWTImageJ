@@ -965,7 +965,9 @@ public class ThresholdAdjuster extends PlugInDialog implements PlugIn, Measureme
 					}
 				}
 			}
-			doUpdate();
+			Display.getDefault().syncExec(() -> {
+				doUpdate();
+			});
 		}
 	}
 

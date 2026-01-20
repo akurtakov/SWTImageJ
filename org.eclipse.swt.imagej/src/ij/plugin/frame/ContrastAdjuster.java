@@ -1216,7 +1216,9 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 				} catch(InterruptedException e) {
 				}
 			}
-			doUpdate();
+			Display.getDefault().syncExec(() -> {
+				doUpdate();
+			});
 		}
 	}
 
