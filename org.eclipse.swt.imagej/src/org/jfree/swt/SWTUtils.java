@@ -148,7 +148,7 @@ public class SWTUtils {
 	 *            between the swt font and the newly created awt font.
 	 * @return An awt font converted from the provided swt font.
 	 */
-	public static java.awt.Font toAwtFont(Device device, FontData fontData, boolean ensureSameSize) {
+	public static java.awt.Font toAwtFont2(Device device, FontData fontData, boolean ensureSameSize) {
 
 		int height = (int)Math.round(fontData.getHeight() * device.getDPI().y / 72.0);
 		// hack to ensure the newly created awt fonts will be rendered with the
@@ -175,7 +175,7 @@ public class SWTUtils {
 		return new java.awt.Font(fontData.getName(), fontData.getStyle(), height);
 	}
 
-	public static java.awt.Font toAwtFont2(Device device, FontData fontData, boolean ensureSameSize) {
+	public static java.awt.Font toAwtFont(Device device, FontData fontData, boolean ensureSameSize) {
 
 		// Convert SWT style to AWT style
 		int awtStyle = java.awt.Font.PLAIN;

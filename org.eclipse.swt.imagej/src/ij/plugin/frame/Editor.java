@@ -255,7 +255,7 @@ public class Editor extends PlugInFrame implements WindowSwt, SelectionListener,
 			ruler.addDecorator(0, annotationRuler);
 			ruler.addDecorator(1, lnrc);
 			/* Create a JFace Projection TextViewer! */
-			sourceViewer = new ProjectionViewer(composite, ruler, overviewRuler, true, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+			sourceViewer = new ProjectionViewer(composite, ruler, overviewRuler, true, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 			projectionSupport = new ProjectionSupport(sourceViewer, null, new EditorSharedTextColors());
 			projectionSupport.install();
 			// turn projection mode on
