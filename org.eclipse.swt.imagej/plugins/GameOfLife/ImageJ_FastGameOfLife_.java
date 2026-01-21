@@ -14,8 +14,8 @@ import ij.*;
  */
 
 public class ImageJ_FastGameOfLife_ implements PlugIn {
-	int WIDTH = 1000;
-	int HEIGHT = 1000;
+	int WIDTH = 3000;
+	int HEIGHT = 3000;
 	int[][] temp;
 	int[] state = { 0, 255 };
 	ImagePlus imp;

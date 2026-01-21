@@ -44,7 +44,7 @@ public class ImageJ_FastGameOfLife_Parallel_ implements PlugIn {
             });
 
             // Single pass bit-shift to advance generation
-            for (int i = 0; i < pixels.length; i++) pixels[i] = (short)((pixels[i] & 0xffff) >>> 8);
+           for (int i = 0; i < pixels.length; i++) pixels[i] = (short)((pixels[i] & 0xffff) >>> 8);
             
             imp.updateAndDraw();
             //To avoid flickering adjust the following wait (Thread.sleep) value!
