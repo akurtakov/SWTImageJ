@@ -36,6 +36,7 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 	private Shell shell;
 
 	public Shell getShell() {
+
 		return shell;
 	}
 
@@ -44,20 +45,19 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 
 		AtomicReference<Boolean> visible = new AtomicReference<Boolean>();
 		Display.getDefault().syncExec(() -> {
-			if (shell != null && !shell.isDisposed()) {
+			if(shell != null && !shell.isDisposed()) {
 				visible.set(shell.isVisible());
 			} else {
 				visible.set(false);
 			}
-
 		});
 		return visible.get();
 	}
 
 	public void close() {
+
 		Display.getDefault().syncExec(() -> {
 			shell.close();
-
 		});
 	}
 
@@ -67,51 +67,49 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 	protected Button cancelButton;
 
 	public WaitForUserDialog(String text) {
+
 		this("Action Required", text);
 	}
 
 	public WaitForUserDialog(String title, String text) {
+
 		AtomicReference<String> ref = new AtomicReference<String>();
 		ref.set(text);
 		Display display = Display.getDefault();
 		display.syncExec(() -> {
-
 			IJ.protectStatusBar(false);
-			if (text != null && text.startsWith("IJ: "))
+			if(text != null && text.startsWith("IJ: "))
 				ref.set(ref.get().substring(4));
-
 			// if (!IJ.isLinux()) label.setFont(new Font("SansSerif", Font.PLAIN, 14));
-			if (IJ.isMacOSX()) {
+			if(IJ.isMacOSX()) {
 				RoiManager rm = RoiManager.getInstance();
-				if (rm != null)
+				if(rm != null)
 					rm.runCommand("enable interrupts");
 			}
-
 			shell = new Shell(display, SWT.TITLE | SWT.ON_TOP | SWT.ICON_INFORMATION);
-
 			Image img = display.getSystemImage(SWT.ICON_INFORMATION);
 			shell.setImage(img);
 			shell.setText("Select");
-
 			shell.setLayout(new FillLayout(SWT.HORIZONTAL));
-
 			Listener l = new Listener() {
+
 				Point origin;
 
 				public void handleEvent(Event e) {
-					switch (e.type) {
-					case SWT.MouseDown:
-						origin = new Point(e.x, e.y);
-						break;
-					case SWT.MouseUp:
-						origin = null;
-						break;
-					case SWT.MouseMove:
-						if (origin != null) {
-							Point p = Display.getDefault().map(shell, null, e.x, e.y);
-							shell.setLocation(p.x - origin.x, p.y - origin.y);
-						}
-						break;
+
+					switch(e.type) {
+						case SWT.MouseDown:
+							origin = new Point(e.x, e.y);
+							break;
+						case SWT.MouseUp:
+							origin = null;
+							break;
+						case SWT.MouseMove:
+							if(origin != null) {
+								Point p = Display.getDefault().map(shell, null, e.x, e.y);
+								shell.setLocation(p.x - origin.x, p.y - origin.y);
+							}
+							break;
 					}
 				}
 			};
@@ -119,9 +117,11 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 			shell.addListener(SWT.MouseUp, l);
 			shell.addListener(SWT.MouseMove, l);
 			shell.addListener(SWT.Close, new Listener() {
+
 				public void handleEvent(Event event) {
+
 					event.doit = false;
-					synchronized (this) {
+					synchronized(this) {
 						notify();
 					}
 					xloc = shell.getLocation().x;
@@ -129,19 +129,15 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 					event.doit = true;
 				}
 			});
-
 			Composite composite = new Composite(shell, SWT.NONE);
 			composite.setLayout(new GridLayout(2, true));
-
 			Label lblNewLabel = new Label(composite, SWT.WRAP);
 			lblNewLabel.addKeyListener(WaitForUserDialog.this);
-
 			lblNewLabel.setAlignment(SWT.CENTER);
 			GridData gd_lblNewLabel = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
 			// gd_lblNewLabel.heightHint = 204;
 			lblNewLabel.setLayoutData(gd_lblNewLabel);
 			lblNewLabel.setText(ref.get());
-
 			okButton = new Button(composite, SWT.NONE);
 			GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 			// layoutData.heightHint = 30;
@@ -149,8 +145,7 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 			okButton.setText("OK");
 			okButton.addSelectionListener(WaitForUserDialog.this);
 			okButton.addKeyListener(WaitForUserDialog.this);
-
-			if (IJ.isMacro()) {
+			if(IJ.isMacro()) {
 				// cancelButton = new Button(" Cancel ");
 				cancelButton = new Button(composite, SWT.NONE);
 				GridData layoutDatacancel = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
@@ -168,22 +163,23 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 			int locationY = (parentSize.height - shellSize.height) / 2 + parentSize.y;
 			shell.setLocation(new Point(locationX, locationY));
 			shell.open();
-			while (!shell.isDisposed()) {
-				if (!display.readAndDispatch())
+			if(display != null && display.getThread() == Thread.currentThread())
+				throw new RuntimeException("To avoid a deadlock, NonBlockingGenericDialog must not be called from the Event Queue");
+			while(!shell.isDisposed()) {
+				if(!display.readAndDispatch())
 					display.sleep();
 			}
-
 		});
 	}
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		String s = ((Button) (e.widget)).getText();
-		if (s.indexOf("Cancel") >= 0) {
+
+		String s = ((Button)(e.widget)).getText();
+		if(s.indexOf("Cancel") >= 0) {
 			escPressed = true;
 		}
 		shell.close();
-
 	}
 
 	@Override
@@ -194,24 +190,24 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+
 		int keyCode = e.character;
 		IJ.setKeyDown(keyCode);
-		if (keyCode == SWT.LF || keyCode == SWT.ESC) {
+		if(keyCode == SWT.LF || keyCode == SWT.ESC) {
 			escPressed = keyCode == SWT.ESC;
 			shell.close();
 		}
-
 	}
 
 	public boolean escPressed() {
+
 		return escPressed;
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+
 		int keyCode = e.character;
 		IJ.setKeyUp(keyCode);
-
 	}
-
 }
