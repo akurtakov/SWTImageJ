@@ -60,6 +60,8 @@ public class FileInfoVirtualStack extends VirtualStack implements PlugIn {
 
 		info = fi;
 		nImages = info.length;
+		if(info[0].sliceLabels != null && info[0].sliceLabels.length == nImages)
+			setSliceLabels(info[0].sliceLabels);
 	}
 
 	/** Opens the specified tiff file as a virtual stack. */
@@ -152,6 +154,7 @@ public class FileInfoVirtualStack extends VirtualStack implements PlugIn {
 			setBitDepth(imp.getBitDepth());
 			imp2.setCalibration(imp.getCalibration());
 			imp2.setOverlay(imp.getOverlay());
+			canTranslate = true;
 			if(fi.info != null)
 				imp2.setProperty("Info", fi.info);
 			if(props != null) {
@@ -219,6 +222,8 @@ public class FileInfoVirtualStack extends VirtualStack implements PlugIn {
 
 		if(n < 1 || n > nImages)
 			throw new IllegalArgumentException("Argument out of range: " + n);
+		if(isTranslatingIndices())
+			throw new IllegalArgumentException("Virtual hyperstack with non-czt order cannot be modified");
 		if(nImages < 1)
 			return;
 		for(int i = n; i < nImages; i++)
@@ -303,6 +308,8 @@ public class FileInfoVirtualStack extends VirtualStack implements PlugIn {
 	/** Adds an image to this stack. */
 	public synchronized void addImage(FileInfo fileInfo) {
 
+		if(isTranslatingIndices())
+			throw new IllegalArgumentException("Virtual hyperstack with non-czt order cannot be modified");
 		if(info == null)
 			info = new FileInfo[250];
 		if(info.length <= nImages) {
