@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -486,22 +487,36 @@ public class MacroInstaller implements PlugIn, MacroConstants, SelectionListener
 		}
 	}
 
+	/* Test if we are inside an exported *.jar and not developing, e.g., in an IDE! */
+	public boolean isRunningFromJar() {
+
+		String className = this.getClass().getSimpleName() + ".class";
+		URL classResource = this.getClass().getResource(className);
+		if(classResource == null)
+			return false;
+		return classResource.getProtocol().equals("jar");
+	}
+
 	/** Returns a text file contained in ij.jar. */
 	public String openFromIJJar(String path) {
 
 		String text = null;
-		try {
-			InputStream is = this.getClass().getResourceAsStream(path);
-			if(is == null)
-				return null;
-			InputStreamReader isr = new InputStreamReader(is);
-			StringBuffer sb = new StringBuffer();
-			char[] b = new char[8192];
-			int n;
-			while((n = isr.read(b)) > 0)
-				sb.append(b, 0, n);
-			text = sb.toString();
-		} catch(IOException e) {
+		if(isRunningFromJar()) {
+			try {
+				InputStream is = this.getClass().getResourceAsStream(path);
+				if(is == null)
+					return null;
+				InputStreamReader isr = new InputStreamReader(is);
+				StringBuffer sb = new StringBuffer();
+				char[] b = new char[8192];
+				int n;
+				while((n = isr.read(b)) > 0)
+					sb.append(b, 0, n);
+				text = sb.toString();
+			} catch(IOException e) {
+			}
+		} else {
+			text = openFromHomeDir(path);
 		}
 		return text;
 	}
@@ -511,7 +526,7 @@ public class MacroInstaller implements PlugIn, MacroConstants, SelectionListener
 	 */
 
 	/** Returns a text file contained in ij.jar. */
-	public String openFromIJJar2(String filepath) {
+	public String openFromHomeDir(String filepath) {
 
 		String pathDir = Prefs.getHomeDir();
 		String path = pathDir + filepath;
