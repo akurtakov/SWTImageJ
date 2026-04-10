@@ -163,8 +163,9 @@ public class WaitForUserDialog implements SelectionListener, KeyListener {
 			int locationY = (parentSize.height - shellSize.height) / 2 + parentSize.y;
 			shell.setLocation(new Point(locationX, locationY));
 			shell.open();
-			if(display != null && display.getThread() == Thread.currentThread())
-				throw new RuntimeException("To avoid a deadlock, NonBlockingGenericDialog must not be called from the Event Queue");
+			/* The following code section is apparantly not needed! */
+			// if(display != null && display.getThread() == Thread.currentThread())
+			// throw new RuntimeException("To avoid a deadlock, NonBlockingGenericDialog must not be called from the Event Queue");
 			while(!shell.isDisposed()) {
 				if(!display.readAndDispatch())
 					display.sleep();
