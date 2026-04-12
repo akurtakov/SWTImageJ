@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-  <feature id="org.eclipse.swt.imagej.feature" version="1.5.0.qualifier">
-    <category name="org.eclipse.swt.imagej"/>
-  </feature>
-  <category-def name="org.eclipse.swt.imagej" label="Eclipse SWTImageJ" />
-  <repository-reference location="https://download.eclipse.org/releases/2026-03/" enabled="true" />
+   <feature id="org.eclipse.swt.imagej.feature" version="1.6.13.qualifier">
+      <category name="org.eclipse.swt.imagej"/>
+   </feature>
+   <category-def name="org.eclipse.swt.imagej" label="Eclipse SWTImageJ"/>
+   <repository-reference location="https://download.eclipse.org/releases/2026-03/" name="" enabled="true" />
 </site>
