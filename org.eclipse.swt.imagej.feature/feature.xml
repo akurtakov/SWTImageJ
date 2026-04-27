@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.swt.imagej.feature"
       label="Eclipse SWTImageJ"
-      version="1.6.14.qualifier"
+      version="1.6.15.qualifier"
       plugin="org.eclipse.swt.imagej"
       license-feature="org.eclipse.license"
       license-feature-version="2.0.2.qualifier">
