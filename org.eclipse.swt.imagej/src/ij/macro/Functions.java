@@ -3674,7 +3674,6 @@ public class Functions implements MacroConstants, Measurements {
 		pointAutoMeasure = Prefs.pointAutoMeasure;
 		requireControlKey = Prefs.requireControlKey;
 		useInvertingLut = Prefs.useInvertingLut;
-		saveSettingsCalled = true;
 		measurements = Analyzer.getMeasurements();
 		decimalPlaces = Analyzer.getPrecision();
 		blackBackground = Prefs.blackBackground;
@@ -3688,13 +3687,12 @@ public class Functions implements MacroConstants, Measurements {
 		plotNoTicks = PlotWindow.noTicks;
 		profileVerticalProfile = Prefs.verticalProfile;
 		profileSubPixelResolution = Prefs.subPixelResolution;
+		saveSettingsCalled = true;
 	}
 
 	void restoreSettings() {
 
 		interp.getParens();
-		if(!saveSettingsCalled)
-			interp.error("saveSettings() not called");
 		Prefs.usePointerCursor = usePointerCursor;
 		IJ.hideProcessStackDialog = hideProcessStackDialog;
 		FloatBlitter.divideByZeroValue = divideByZeroValue;
@@ -3728,6 +3726,7 @@ public class Functions implements MacroConstants, Measurements {
 		PlotWindow.noTicks = plotNoTicks;
 		Prefs.verticalProfile = profileVerticalProfile;
 		Prefs.subPixelResolution = profileSubPixelResolution;
+		Prefs.requireControlKey = requireControlKey;
 	}
 
 	void setKeyDown() {
@@ -5672,6 +5671,8 @@ public class Functions implements MacroConstants, Measurements {
 			Prefs.mouseWheelStackScrolling = state;
 		else if(arg1.startsWith("setijmenubar"))
 			Prefs.setIJMenuBar = state;
+		else if(arg1.startsWith("requirecontrolkey"))
+			Prefs.requireControlKey = state;
 		else
 			interp.error("Invalid option");
 	}

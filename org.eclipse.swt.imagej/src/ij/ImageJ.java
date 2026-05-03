@@ -148,7 +148,7 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 	 * string.
 	 */
 	public static final String VERSION = "1.54t";
-	public static final String BUILD = "4";
+	public static final String BUILD = "8";
 	public static org.eclipse.swt.graphics.Color backgroundColor = new org.eclipse.swt.graphics.Color(237, 237, 237);
 	/** SansSerif, 12-point, plain font. */
 	public static final Font SansSerif12 = new Font("SansSerif", Font.PLAIN, 12);
@@ -698,8 +698,11 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		if(keyCode == SWT.SEPARATOR)
 			keyCode = SWT.KEYPAD_DECIMAL;
 		boolean functionKey = keyCode >= SWT.F1 && keyCode <= SWT.F12;
+		boolean arrowKey = keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40;
+		if(Interpreter.getInstance() == null)
+			arrowKey = false;
 		boolean numPad = keyCode == SWT.KEYPAD_DIVIDE || keyCode == SWT.KEYPAD_MULTIPLY || keyCode == SWT.KEYPAD_DECIMAL || (keyCode >= SWT.KEYPAD_0 && keyCode <= SWT.KEYPAD_9);
-		if((!Prefs.requireControlKey || control || meta || functionKey || numPad) && keyChar != '+') {
+		if((!Prefs.requireControlKey || control || meta || functionKey || numPad || arrowKey) && keyChar != '+') {
 			Hashtable shortcuts = Menus.getShortcuts();
 			if(shift && !functionKey) {
 				/*
@@ -798,10 +801,10 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 						cmd = "Next Slice [>]";
 					else if(stackKey && keyCode == SWT.LEFT)
 						cmd = "Previous Slice [<]";
-					else if(zoomKey && keyCode == SWT.DOWN && !ignoreArrowKeys(imp, control) && Toolbar.getToolId() < Toolbar.SPARE6)
-						cmd = "Out [-]";
-					else if(zoomKey && keyCode == SWT.UP && !ignoreArrowKeys(imp, control) && Toolbar.getToolId() < Toolbar.SPARE6)
-						cmd = "In [+]";
+					// else if (zoomKey && keyCode==KeyEvent.VK_DOWN && !ignoreArrowKeys(imp,control) && Toolbar.getToolId()<Toolbar.SPARE6)
+					// cmd="Out [-]";
+					// else if (zoomKey && keyCode==KeyEvent.VK_UP && !ignoreArrowKeys(imp,control) && Toolbar.getToolId()<Toolbar.SPARE6)
+					// cmd="In [+]";
 					else if(roi != null) {
 						if((flags & SWT.ALT) != 0 || (flags & SWT.CTRL) != 0)
 							roi.nudgeCorner(keyCode);

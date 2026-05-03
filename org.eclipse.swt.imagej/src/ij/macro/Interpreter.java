@@ -212,6 +212,7 @@ public class Interpreter implements MacroConstants {
 		else
 			doBlock();
 		finishUp();
+		setInstance(previousInstance);
 		Recorder.recordInMacros = false;
 	}
 
@@ -269,7 +270,6 @@ public class Interpreter implements MacroConstants {
 		if(done)
 			return;
 		token = pgm.code[++pc];
-		// IJ.log(pc+" "+pgm.decodeToken(token));
 		if(token <= 127)
 			return;
 		tokenAddress = token >> TOK_SHIFT;
@@ -2364,6 +2364,10 @@ public class Interpreter implements MacroConstants {
 		}
 		if(func.unUpdatedTable != null)
 			func.unUpdatedTable.show(func.unUpdatedTable.getTitle());
+		if(func.saveSettingsCalled) {
+			func.saveSettingsCalled = false;
+			func.restoreSettings();
+		}
 	}
 
 	/** Aborts currently running macro. */
