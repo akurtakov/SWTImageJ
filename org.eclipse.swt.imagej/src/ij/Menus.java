@@ -464,11 +464,13 @@ public class Menus {
 		menuItemGames.setText("Games");
 		submenu = new org.eclipse.swt.widgets.Menu(ij.getShell(), SWT.DROP_DOWN);
 		menuItemGames.setMenu(submenu);
+		addExample(submenu, "2048", "2048.ijm");
 		addExample(submenu, "Asteroids", "Asteroids.js");
 		addExample(submenu, "Breakout", "Breakout.ijm");
 		addExample(submenu, "Life", "GameOfLife.js");
 		addExample(submenu, "Pong", "Pong.ijm");
 		addExample(submenu, "Snake", "Snake.ijm");
+		addExample(submenu, "Tetris", "Tetris.js");
 		menuItemGames.addSelectionListener(listener);
 		menuItemGames.addSelectionListener(listener);
 		// menu.add(submenu);
