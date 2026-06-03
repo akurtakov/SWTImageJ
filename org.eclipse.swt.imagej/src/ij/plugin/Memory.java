@@ -95,7 +95,6 @@ public class Memory implements PlugIn {
 	}
 	
 	public long getMemorySetting() {
-		if (IJ.getApplet()!=null) return 0L;
 		long max = 0L;
 		if (IJ.isMacOSX()) {
 			String appPath = System.getProperty("java.class.path");

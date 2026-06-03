@@ -1,6 +1,5 @@
 package ij;
 
-import java.applet.Applet;
 import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
@@ -72,7 +71,6 @@ public class Menus {
 			LabStackItem, HSB32Item;
 	private static org.eclipse.swt.widgets.Menu popup;
 	private static ImageJ ij;
-	private static Applet applet;
 	private Hashtable demoImagesTable = new Hashtable();
 	private static String ImageJPath, pluginsPath, macrosPath;
 	private static Properties menus;
@@ -105,12 +103,11 @@ public class Menus {
 	static boolean jnlp; // true when using Java WebStart
 	public static int setMenuBarCount;
 
-	Menus(ImageJ ijInstance, Applet appletInstance) {
+	Menus(ImageJ ijInstance) {
 
 		ij = ijInstance;
 		// String title = ij!=null?ij.getTitle():null;
 		String title = "ImageJ SWT";
-		applet = appletInstance;
 		instance = this;
 		fontSize = Prefs.getInt(Prefs.MENU_SIZE, defaultFontSize);
 	}
@@ -294,10 +291,8 @@ public class Menus {
 		new org.eclipse.swt.widgets.MenuItem(help, SWT.SEPARATOR);
 		org.eclipse.swt.widgets.Menu aboutMenu = getMenu("Help>About Plugins", true);
 		addPlugInItem(help, "About ImageJ...", "ij.plugin.AboutBox", 0, false);
-		if(applet == null) {
-			menuSeparators = new Properties();
-			installPlugins();
-		}
+		menuSeparators = new Properties();
+		installPlugins();
 		// make sure "Quit" is the last item in the File menu
 		// file.addSeparator();
 		new org.eclipse.swt.widgets.MenuItem(file, SWT.SEPARATOR);
@@ -603,7 +598,7 @@ public class Menus {
 			else
 				addPluginItem(submenu, value);
 		}
-		if(name.equals("Lookup Tables") && applet == null)
+		if(name.equals("Lookup Tables"))
 			addLuts(submenu);
 		return submenu;
 	}
@@ -615,7 +610,7 @@ public class Menus {
 			return;
 		File f = new File(path);
 		String[] list = null;
-		if(applet == null && f.exists() && f.isDirectory())
+		if(f.exists() && f.isDirectory())
 			list = f.list();
 		if(list == null)
 			return;
@@ -1257,8 +1252,7 @@ public class Menus {
 				if(!(new File(ijDir + File.separator + "plugins")).isDirectory())
 					ijDir = ijDir + File.separator + "ImageJ";
 				// needed to run plugins when ImageJ launched using Java WebStart
-				if(applet == null)
-					System.setSecurityManager(null);
+				System.setSecurityManager(null);
 				jnlp = true;
 			}
 			pluginsPath = ijDir + File.separator + "plugins" + File.separator;
@@ -2155,7 +2149,7 @@ public class Menus {
 				}
 			}
 			jarFiles = macroFiles = null;
-			Menus m = new Menus(IJ.getInstance(), IJ.getApplet());
+			Menus m = new Menus(IJ.getInstance());
 			String err = m.addMenuBar();
 			/* Extra call for SWT! */
 			updateMenus();

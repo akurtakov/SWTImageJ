@@ -996,7 +996,7 @@ public class ImageWindow implements MouseWheelListener {
 		Roi roi = imp.getRoi();
 		if(roi != null && (roi instanceof PointRoi) && ((PointRoi)roi).promptBeforeDeleting())
 			changes = true;
-		if(ij == null || ij.quittingViaMacro() || IJ.getApplet() != null || Interpreter.isBatchMode() || IJ.macroRunning() || virtual)
+		if(ij == null || ij.quittingViaMacro() || Interpreter.isBatchMode() || IJ.macroRunning() || virtual)
 			changes = false;
 		if(changes) {
 			String msg;

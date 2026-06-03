@@ -178,8 +178,6 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 	private ProgressBar progressBar;
 	private Label statusLine;
 	private boolean firstTime = true;
-	@SuppressWarnings("removal")
-	private java.applet.Applet applet; // null if not running as an applet
 	private Vector classes = new Vector();
 	public boolean exitWhenQuitting;
 	private boolean quitting;
@@ -215,23 +213,9 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 	/** Creates a new ImageJ frame that runs as an application. */
 	public ImageJ() {
 
-		this(null, STANDALONE);
+		this(STANDALONE);
 	}
 
-	/**
-	 * Creates a new ImageJ frame that runs as an application in the specified mode.
-	 */
-	public ImageJ(int mode) {
-
-		this(null, mode);
-	}
-
-	/** Creates a new ImageJ frame that runs as an applet. */
-	@SuppressWarnings("removal")
-	public ImageJ(java.applet.Applet applet) {
-
-		this(applet, STANDALONE);
-	}
 	/*
 	 * public ImageJ(java.applet.Applet applet, int mode) { this(applet,
 	 * STANDALONE); }
@@ -243,7 +227,7 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 	 * (non-standalone) version of ImageJ.
 	 */
 	@SuppressWarnings("removal")
-	public ImageJ(java.applet.Applet applet, int mode) {
+	public ImageJ(int mode) {
 
 		Prefs.setHomeDir(getImageJPath(ImageJ.SWT_MODE));
 		// System.out.println("Path set by constructor!" +
@@ -260,9 +244,8 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		}
 		if(IJ.debugMode)
 			IJ.log("ImageJ starting in debug mode: " + mode);
-		embedded = applet == null && (mode == EMBEDDED || mode == NO_SHOW);
-		this.applet = applet;
-		String err1 = Prefs.load(this, applet);
+		embedded = mode == EMBEDDED || mode == NO_SHOW;
+		String err1 = Prefs.load(this);
 		Point loc = getPreferredLocation();
 		// shell.setCursor(Cursor.getDefaultCursor()); // work-around for JDK 1.1.8 bug
 		if(mode != NO_SHOW) {
@@ -288,7 +271,7 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		composite.setLayout(new GridLayout(1, true));
 		// Menu menuBar = new Menu(shell, SWT.BAR);
 		// createShellMenu(shell, menuBar);
-		Menus m = new Menus(this, applet);
+		Menus m = new Menus(this);
 		String err2 = m.addMenuBar();
 		m.installPopupMenu(this);
 		m.installStartupMacroSet(); // add custom tools
@@ -319,7 +302,7 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		progressBar.addKeyListener(this);
 		progressBar.addMouseListener(this);
 		/* Set's the instance in ImageJ! */
-		IJ.init(this, applet);
+		IJ.init(this);
 		if(mode != NO_SHOW) {
 			try {
 				setIcon();
@@ -333,8 +316,7 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 			shell.pack();
 			Dimension tbSize = toolbar.getPreferredSize();
 			shell.setSize(tbSize.width + 30, 130);
-			if(applet == null)
-				IJ.runPlugIn("ij.plugin.DragAndDrop", "");
+			IJ.runPlugIn("ij.plugin.DragAndDrop", "");
 		}
 		if(err1 != null)
 			IJ.error(err1);
@@ -342,7 +324,7 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 			IJ.error(err2);
 			// IJ.runPlugIn("ij.plugin.ClassChecker", "");
 		}
-		if(IJ.isMacintosh() && applet == null) {
+		if(IJ.isMacintosh()) {
 			try {
 				if(IJ.javaVersion() > 8) // newer JREs use different drag-drop, about mechanism
 					IJ.runPlugIn("ij.plugin.MacAdapter9", "");
@@ -357,9 +339,8 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		}
 		String str = m.getMacroCount() == 1 ? " macro" : " macros";
 		configureProxy();
-		if(applet == null)
-			// loadCursors();
-			(new ij.macro.StartupRunner()).run(batchMode); // run RunAtStartup and AutoRun macros
+		// loadCursors();
+		new ij.macro.StartupRunner().run(batchMode); // run RunAtStartup and AutoRun macros
 		IJ.showStatus(version() + m.getPluginCount() + " commands; " + m.getMacroCount() + str);
 		// startSleak();
 	}
@@ -1099,10 +1080,10 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 		/* Changed for SWT no */
 		// if (!noGUI && (ij==null || (ij!=null && !ij.isShowing()))) {
 		if(!noGUI && (ij == null || (ij != null))) {
-			ij = new ImageJ(null, mode);
+			ij = new ImageJ(mode);
 			ij.exitWhenQuitting = true;
 		} else if(batchMode && noGUI)
-			Prefs.load(null, null);
+			Prefs.load(null);
 		int macros = 0;
 		for(int i = 0; i < nArgs; i++) {
 			String arg = args[i];
@@ -1240,11 +1221,9 @@ public class ImageJ implements ImageObserver, ShellListener, org.eclipse.swt.eve
 				quitting = false;
 				return;
 			}
-			if(applet == null) {
-				saveWindowLocations();
-				Prefs.set(ImageWindow.LOC_KEY, null); // don't save image window location
-				Prefs.savePreferences();
-			}
+			saveWindowLocations();
+			Prefs.set(ImageWindow.LOC_KEY, null); // don't save image window location
+			Prefs.savePreferences();
 			IJ.cleanup();
 			/* Will set e.doit to true! */
 			closeFinally = true;

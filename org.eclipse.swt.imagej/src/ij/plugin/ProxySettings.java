@@ -18,7 +18,6 @@ public class ProxySettings implements PlugIn {
 	private int proxyport = (int)Prefs.get("proxy.port", 8080);
 	
 	public void run(String arg) {
-		if (IJ.getApplet()!=null) return;
 		String host = System.getProperty("http.proxyHost");
 		if (host!=null) proxyhost = host;
 		String port = System.getProperty("http.proxyPort");

@@ -1,6 +1,5 @@
 package ij.plugin;
 
-import java.applet.Applet;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -49,15 +48,6 @@ public class JavaProperties implements PlugIn {
 				str2 = "<lf>";
 		}
 		list.add("  line.separator: " + str1 + str2);
-		Applet applet = IJ.getApplet();
-		if(applet != null) {
-			list.add("");
-			list.add("  code base: " + applet.getCodeBase());
-			list.add("  document base: " + applet.getDocumentBase());
-			list.add("  sample images dir: " + Prefs.getImagesURL());
-			TextWindow tw = new TextWindow("Properties", "", list, 400, 400);
-			return;
-		}
 		list.add("");
 		show("user.name");
 		show("user.home");

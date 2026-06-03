@@ -5754,8 +5754,6 @@ public class Functions implements MacroConstants, Measurements {
 			state = getImage().isHyperStack();
 		else if(arg.indexOf("batch") != -1)
 			state = Interpreter.isBatchMode();
-		else if(arg.indexOf("applet") != -1)
-			state = IJ.getApplet() != null;
 		else if(arg.indexOf("virtual") != -1)
 			state = getImage().getStack().isVirtual();
 		else if(arg.indexOf("composite") != -1)

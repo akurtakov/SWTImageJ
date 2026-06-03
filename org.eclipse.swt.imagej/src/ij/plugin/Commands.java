@@ -1,6 +1,5 @@
 package ij.plugin;
 
-import java.applet.Applet;
 import java.io.File;
 
 import ij.IJ;
@@ -167,24 +166,19 @@ public class Commands implements PlugIn {
 	// Plugins>Macros>Open Startup Macros command
 	void openStartupMacros() {
 
-		Applet applet = IJ.getApplet();
-		if(applet != null)
-			IJ.run("URL...", "url=" + IJ.URL2 + "/applet/StartupMacros.txt");
-		else {
-			String path = IJ.getDirectory("macros") + "StartupMacros.txt";
-			File f = new File(path);
-			if(!f.exists()) {
-				path = IJ.getDirectory("macros") + "StartupMacros.ijm";
-				f = new File(path);
-			}
-			if(!f.exists()) {
-				path = IJ.getDirectory("macros") + "StartupMacros.fiji.ijm";
-				f = new File(path);
-			}
-			if(!f.exists())
-				IJ.error("\"StartupMacros.txt\" not found in ImageJ/macros/");
-			else
-				IJ.open(path);
+		String path = IJ.getDirectory("macros") + "StartupMacros.txt";
+		File f = new File(path);
+		if(!f.exists()) {
+			path = IJ.getDirectory("macros") + "StartupMacros.ijm";
+			f = new File(path);
 		}
+		if(!f.exists()) {
+			path = IJ.getDirectory("macros") + "StartupMacros.fiji.ijm";
+			f = new File(path);
+		}
+		if(!f.exists())
+			IJ.error("\"StartupMacros.txt\" not found in ImageJ/macros/");
+		else
+			IJ.open(path);
 	}
 }
