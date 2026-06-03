@@ -1,6 +1,5 @@
 package ij;
 
-import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -357,7 +356,7 @@ public class Prefs {
 	 * 
 	 * @return an error message if "IJ_Props.txt" not found.
 	 */
-	public static String load(Object ij, Applet applet) {
+	public static String load(Object ij) {
 
 		if(ImageJDir == null)
 			ImageJDir = System.getProperty("user.dir");
@@ -373,8 +372,6 @@ public class Prefs {
 				// Look in ij.jar if not found in ImageJ folder
 				f = ij.getClass().getResourceAsStream("/" + PROPS_NAME);
 			}
-			if(applet != null)
-				return loadAppletProps(f, applet);
 			if(f == null)
 				return PROPS_NAME + " not found in ij.jar or in " + ImageJDir;
 			f = new BufferedInputStream(f);
@@ -401,24 +398,6 @@ public class Prefs {
 	 * }
 	 * }
 	 */
-
-	static String loadAppletProps(InputStream f, Applet applet) {
-
-		if(f == null)
-			return PROPS_NAME + " not found in ij.jar";
-		try {
-			props.load(f);
-			f.close();
-		} catch(IOException e) {
-			return ("Error loading " + PROPS_NAME);
-		}
-		try {
-			URL url = new URL(applet.getDocumentBase(), "images/");
-			imagesURL = url.toString();
-		} catch(Exception e) {
-		}
-		return null;
-	}
 
 	/** Returns the URL of the directory that contains the ImageJ sample images. */
 	public static String getImagesURL() {

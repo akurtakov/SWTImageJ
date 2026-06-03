@@ -599,7 +599,7 @@ public class WindowManager {
 			}
 		}
 		ImageJ ij = IJ.getInstance();
-		if(ij != null && ij.quitting() && IJ.getApplet() == null)
+		if(ij != null && ij.quitting())
 			return true;
 		for(int i = 0; i < nonImages.length; i++) {
 			/* Changed for SWT */

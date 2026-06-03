@@ -1,6 +1,5 @@
 package ij;
 
-import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -129,7 +128,6 @@ public class IJ {
 	public static final char angstromSymbol = '\u00C5';
 	public static final char degreeSymbol = '\u00B0';
 	private static ImageJ ij;
-	private static java.applet.Applet applet;
 	private static ProgressBar progressBar;
 	private static TextPanel textPanel;
 	private static String osname, osarch;
@@ -194,17 +192,15 @@ public class IJ {
 		df[0].setRoundingMode(RoundingMode.HALF_UP);
 	}
 
-	static void init(ImageJ imagej, Applet theApplet) {
+	static void init(ImageJ imagej) {
 
 		ij = imagej;
-		applet = theApplet;
 		progressBar = ij.getProgressBar();
 	}
 
 	static void cleanup() {
 
 		ij = null;
-		applet = null;
 		progressBar = null;
 		textPanel = null;
 	}
@@ -294,7 +290,7 @@ public class IJ {
 			IJ.log("runPlugIn: " + className + argument(arg));
 		// Load using custom classloader if this is a user
 		// plugin and we are not running as an applet
-		if(!className.startsWith("ij.") && applet == null)
+		if(!className.startsWith("ij."))
 			return runUserPlugIn(commandName, className, arg, false);
 		Object thePlugIn = null;
 		try {
@@ -330,8 +326,6 @@ public class IJ {
 
 		if(IJ.debugMode)
 			IJ.log("runUserPlugIn: " + className + ", arg=" + argument(arg));
-		if(applet != null)
-			return null;
 		if(createNewLoader)
 			classLoader = null;
 		ClassLoader loader = getClassLoader();
@@ -564,15 +558,6 @@ public class IJ {
 	public static boolean isMacro() {
 
 		return macroRunning || Interpreter.getInstance() != null;
-	}
-
-	/**
-	 * Returns the Applet that created this ImageJ or null if running as an
-	 * application.
-	 */
-	public static java.applet.Applet getApplet() {
-
-		return applet;
 	}
 
 	/**

@@ -1781,10 +1781,9 @@ public class Toolbar extends org.eclipse.swt.widgets.Canvas implements PaintList
 		String path = IJ.getDir("macros") + "toolsets/";
 		if (path == null)
 			return;
-		boolean applet = IJ.getApplet() != null;
 		File f = new File(path);
 		String[] list;
-		if (!applet && f.exists() && f.isDirectory()) {
+		if (f.exists() && f.isDirectory()) {
 			list = f.list();
 			if (list == null)
 				return;
@@ -1797,7 +1796,7 @@ public class Toolbar extends org.eclipse.swt.widgets.Canvas implements PaintList
 			path = IJ.getDir("macros") + "StartupMacros.ijm";
 			f = new File(path);
 		}
-		if (!applet && f.exists())
+		if (f.exists())
 			addItem("Startup Macros");
 		else
 			addItem("StartupMacros*");

@@ -73,7 +73,7 @@ public class Converter implements PlugIn {
 				if (imp.isThreshold())
 					imp.getProcessor().resetThreshold();
 				boolean saveChanges = imp.changes;
-				imp.changes = IJ.getApplet() == null; // if not applet, set 'changes' flag
+				imp.changes = true; // if not applet, set 'changes' flag
 				ImageWindow win = imp.getWindow();
 				try {
 					if (stack != null) {

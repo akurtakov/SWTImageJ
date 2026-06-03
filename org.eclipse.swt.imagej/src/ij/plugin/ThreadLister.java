@@ -16,8 +16,6 @@ import ij.text.TextWindow;
 public class ThreadLister implements PlugIn {
 
 	public void run(String arg) {
-		if (IJ.getApplet()!=null)
-			return;
 		CharArrayWriter caw = new CharArrayWriter();
 		PrintWriter pw = new PrintWriter(caw);
 		try {
