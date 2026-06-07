@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -426,7 +425,7 @@ public class Prefs {
 		String path = Menus.getImageJPath();
 		if(path == null) {
 			String ijPath = ImageJDir;
-			if (ijPath==null)
+			if(ijPath == null)
 				ijPath = getPluginsDirProperty();
 			if(ijPath == null)
 				ijPath = System.getProperty("user.dir");
@@ -491,7 +490,7 @@ public class Prefs {
 	/** Sets the path to the ImageJ directory. */
 	static void setHomeDir(String path) {
 
-		if (path.endsWith(File.separator) || path.endsWith("/"))
+		if(path.endsWith(File.separator) || path.endsWith("/"))
 			path = path.substring(0, path.length() - 1);
 		ImageJDir = path;
 	}
