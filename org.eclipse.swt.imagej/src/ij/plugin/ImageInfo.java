@@ -35,6 +35,7 @@ import ij.process.ImageStatistics;
 import ij.process.LUT;
 import ij.text.TextWindow;
 import ij.util.Tools;
+import ij.util.DicomTools;
 
 /** This plugin implements the Image/Show Info command. */
 public class ImageInfo implements PlugIn {
@@ -107,9 +108,13 @@ public class ImageInfo implements PlugIn {
 			}
 		}
 		String info = getInfo(imp, ip);
-		if(infoProperty != null)
-			return infoProperty + "--------------------------------------------\n" + info;
-		else
+		String separator = "--------------------------------------------\n"; 
+		if (infoProperty!=null) {
+			String DicomSummary = "";
+			if (infoProperty.contains("7FE0,0010"))
+				DicomSummary = DicomTools.getMetadataSummary(imp) + separator;
+			return DicomSummary + infoProperty + separator + info;
+		} else
 			return info;
 	}
 

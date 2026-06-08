@@ -23,6 +23,7 @@ public class Program implements MacroConstants {
     // run keyboard shortcut macros on event dispatch thread?
 	boolean queueCommands; 
 	Hashtable extensionRegistry;
+	boolean hasQuestionMark;
 			
 	public Program() {
 		if (systemTable!=null) {
