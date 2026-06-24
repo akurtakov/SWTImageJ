@@ -73,6 +73,7 @@ import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
+import ij.process.DoubleProcessor;
 import ij.process.FloatPolygon;
 import ij.process.FloatProcessor;
 import ij.process.ImageConverter;
@@ -108,6 +109,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	public static final int COLOR_256 = 3;
 	/** 32-bit RGB color */
 	public static final int COLOR_RGB = 4;
+	/** 64-bit double-precision floating-point grayscale. */
+	public static final int GRAY64 = 5;
 	/** Title of image used by Flatten command */
 	public static final String flattenTitle = "flatten~canvas";
 	/** True if any changes have been made to this image. */
@@ -1149,6 +1152,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			type = COLOR_RGB;
 		else if(ip instanceof ShortProcessor)
 			type = GRAY16;
+		else if(ip instanceof DoubleProcessor)
+			type = GRAY64;
 		else
 			type = GRAY32;
 		if(width == 0)
@@ -1653,6 +1658,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			case ImagePlus.GRAY32:
 				size *= 4.0;
 				break;
+			case ImagePlus.GRAY64:
+				size *= 8.0;
+				break;
 			case ImagePlus.COLOR_RGB:
 				size *= 4.0;
 				break;
@@ -1858,6 +1866,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				case GRAY32:
 					bitDepth = 32;
 					break;
+				case GRAY64:
+					bitDepth = 64;
+					break;
 				case COLOR_RGB:
 					bitDepth = 24;
 					break;
@@ -1872,6 +1883,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			return 24;
 		else if(ip2 instanceof FloatProcessor)
 			return 32;
+		else if(ip2 instanceof DoubleProcessor)
+			return 64;
 		return 0;
 	}
 
@@ -1884,6 +1897,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			case GRAY32:
 			case COLOR_RGB:
 				return 4;
+			case GRAY64:
+				return 8;
 			default:
 				return 1;
 		}
@@ -1891,7 +1906,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 
 	protected void setType(int type) {
 
-		if((type < 0) || (type > COLOR_RGB))
+		if((type < 0) || (type > GRAY64))
 			return;
 		int previousType = imageType;
 		imageType = type;
@@ -2281,8 +2296,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				break;
 			case GRAY16:
 			case GRAY32:
+			case GRAY64:
 				if(ip != null)
-					pvalue[0] = ip.getPixel(x, y);
+					pvalue[0] = (int)ip.getPixelValue(x, y);
 				break;
 		}
 		return pvalue;
@@ -3026,6 +3042,15 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 * @see #getOriginalFileInfo
 	 * @see #setFileInfo
 	 */
+	/**
+	 * Returns a FileInfo object containing information, including the pixel array,
+	 * needed to save this image. Use getOriginalFileInfo() to get a copy of the
+	 * FileInfo object used to open the image.
+	 *
+	 * @see ij.io.FileInfo
+	 * @see #getOriginalFileInfo
+	 * @see #setFileInfo
+	 */
 	public FileInfo getFileInfo() {
 
 		FileInfo fi = new FileInfo();
@@ -3082,6 +3107,30 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				break;
 			case GRAY32:
 				fi.fileType = fi.GRAY32_FLOAT;
+				if(!compositeImage) {
+					lut = createLut();
+					if(!lut.isGrayscale() || (ip != null && !ip.isDefaultLut()))
+						addLut(lut, fi);
+				}
+				break;
+			case GRAY64:
+				// 64-bit double-precision floating-point.
+				//
+				// Without this arm, the switch fell through to default and
+				// fi.fileType stayed at its constructor default of GRAY8 (=0).
+				// FileSaver then asked TiffEncoder to emit an 8-bit TIFF using
+				// the actual double[] pixel buffer, which failed downstream.
+				// File > Save As > Tiff... produced an error claiming a
+				// 32-bit image was required, even though the loaded file
+				// was already a valid 64-bit DoubleProcessor image.
+				//
+				// FileInfo.GRAY64_FLOAT exists, TiffEncoder.GRAY64_FLOAT is
+				// fully wired (bitsPerSample=64, FLOATING_POINT sample format,
+				// emits the 8-byte IEEE-754 stream via writeDouble), and
+				// FileOpener already opens GRAY64_FLOAT back into a
+				// DoubleProcessor (FileOpener line 137+). So a round-trip
+				// Save -> Open now preserves full 64-bit precision.
+				fi.fileType = fi.GRAY64_FLOAT;
 				if(!compositeImage) {
 					lut = createLut();
 					if(!lut.isGrayscale() || (ip != null && !ip.isDefaultLut()))
@@ -3375,6 +3424,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			case 32:
 				ip2 = new FloatProcessor(width, height);
 				break;
+			case 64:
+				ip2 = new DoubleProcessor(width, height);
+				break;
 			default:
 				throw new IllegalArgumentException("Invalid bit depth");
 		}
@@ -3657,6 +3709,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				double value = Float.intBitsToFloat(v[0]);
 				String s = (int)value == value ? IJ.d2s(value, 0) + ".0" : IJ.d2s(value, 4, 7);
 				return (", value=" + s);
+			case GRAY64:
+				double d = (ip instanceof DoubleProcessor) ? ((DoubleProcessor)ip).getPixelValueDouble(x, y) : ip.getPixelValue(x, y);
+				String ds = (int)d == d ? IJ.d2s(d, 0) + ".0" : IJ.d2s(d, 4, 17);
+				return ", value=" + ds;
 			case COLOR_RGB:
 				if(ip != null && ip.getNChannels() == 1)
 					return (", value=" + v[0]);
@@ -3731,6 +3787,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			case ImagePlus.GRAY32:
 			case ImagePlus.COLOR_RGB:
 				bytesPerPixel = 4;
+				break;
+			case ImagePlus.GRAY64:
+				bytesPerPixel = 8;
+				break;
 		}
 		if(!batchMode) {
 			msg = (cut) ? "Cut" : "Copy";

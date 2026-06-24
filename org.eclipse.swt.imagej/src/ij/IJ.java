@@ -2726,7 +2726,7 @@ public class IJ {
 
 	/**
 	 * Creates a new imagePlus. <code>Type</code> should contain "8-bit", "16-bit",
-	 * "32-bit" or "RGB". In addition, it can contain "white", "black" or "ramp".
+	 * "32-bit" , "64-bit" or "RGB". In addition, it can contain "white", "black" or "ramp".
 	 * <code>Width</code> and <code>height</code> specify the width and height of
 	 * the image in pixels. <code>Depth</code> specifies the number of stack slices.
 	 */
@@ -2739,11 +2739,16 @@ public class IJ {
 		boolean signedInt = type.contains("32-bit int");
 		if(type.contains("32"))
 			bitDepth = 32;
+		if(type.contains("64"))
+			bitDepth = 64;
 		if(type.contains("24") || type.contains("rgb") || signedInt)
 			bitDepth = 24;
 		int options = NewImage.FILL_WHITE;
-		if(bitDepth == 16 || bitDepth == 32)
+		// audit-ok: numeric grayscale types (short/float/double) default to zero-filled
+		// pixels; only 8-bit and RGB fall through to FILL_WHITE for legacy parity.
+		if(bitDepth == 16 || bitDepth == 32 || bitDepth == 64)
 			options = NewImage.FILL_BLACK;
+		options = NewImage.FILL_BLACK;
 		if(type.contains("white"))
 			options = NewImage.FILL_WHITE;
 		else if(type.contains("black"))

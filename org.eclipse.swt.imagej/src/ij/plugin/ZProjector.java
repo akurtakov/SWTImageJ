@@ -13,6 +13,7 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.frame.Recorder;
 import ij.process.ByteProcessor;
+import ij.process.DoubleProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
@@ -37,6 +38,7 @@ public class ZProjector implements PlugIn {
 	private static final int BYTE_TYPE = 0;
 	private static final int SHORT_TYPE = 1;
 	private static final int FLOAT_TYPE = 2;
+	private static final int DOUBLE_TYPE = 3;
 	public static final String lutMessage = "Stacks with inverting LUTs may not project correctly.\n" + "To create a standard LUT, invert the stack (Edit/Invert)\n" + "and invert the LUT (Image/Lookup Tables/Invert LUT).";
 	/** Image to hold z-projection. */
 	private ImagePlus projImage = null;
@@ -348,6 +350,7 @@ public class ZProjector implements PlugIn {
 	}
 
 	/** Performs actual projection using specified method. */
+	/** Performs actual projection using specified method. */
 	public void doProjection() {
 
 		if(imp == null)
@@ -369,13 +372,7 @@ public class ZProjector implements PlugIn {
 			projImage = doMedianProjection();
 			return;
 		}
-		// Create new float processor for projected pixels.
-		FloatProcessor fp = new FloatProcessor(imp.getWidth(), imp.getHeight());
 		ImageStack stack = imp.getStack();
-		RayFunction rayFunc = getRayFunction(method, fp);
-		if(IJ.debugMode == true) {
-			IJ.log("\nProjecting stack from: " + startSlice + " to: " + stopSlice);
-		}
 		// Determine type of input image. Explicit determination of
 		// processor type is required for subsequent pixel
 		// manipulation. This approach is more efficient than the
@@ -388,9 +385,20 @@ public class ZProjector implements PlugIn {
 			ptype = SHORT_TYPE;
 		else if(stack.getProcessor(1) instanceof FloatProcessor)
 			ptype = FLOAT_TYPE;
+		else if(stack.getProcessor(1) instanceof DoubleProcessor)
+			ptype = DOUBLE_TYPE;
 		else {
 			IJ.error("Z Project", "Non-RGB stack required");
 			return;
+		}
+		// For 64-bit input accumulate into a DoubleProcessor so that full
+		// precision is preserved; otherwise use a FloatProcessor as before.
+		boolean isDouble = ptype == DOUBLE_TYPE;
+		FloatProcessor fp = isDouble ? null : new FloatProcessor(imp.getWidth(), imp.getHeight());
+		DoubleProcessor dp = isDouble ? new DoubleProcessor(imp.getWidth(), imp.getHeight()) : null;
+		RayFunction rayFunc = isDouble ? getRayFunction(method, dp) : getRayFunction(method, fp);
+		if(IJ.debugMode == true) {
+			IJ.log("\nProjecting stack from: " + startSlice + " to: " + stopSlice);
 		}
 		// Do the projection
 		int sliceCount = 0;
@@ -404,17 +412,32 @@ public class ZProjector implements PlugIn {
 		}
 		// Finish up projection.
 		if(method == SUM_METHOD) {
-			if(imp.getCalibration().isSigned16Bit())
-				fp.subtract(sliceCount * 32768.0);
-			fp.resetMinAndMax();
-			projImage = new ImagePlus(makeTitle(), fp);
+			if(isDouble) {
+				dp.resetMinAndMax();
+				projImage = new ImagePlus(makeTitle(), dp);
+			} else {
+				if(imp.getCalibration().isSigned16Bit())
+					fp.subtract(sliceCount * 32768.0);
+				fp.resetMinAndMax();
+				projImage = new ImagePlus(makeTitle(), fp);
+			}
 		} else if(method == SD_METHOD) {
 			rayFunc.postProcess();
-			fp.resetMinAndMax();
-			projImage = new ImagePlus(makeTitle(), fp);
+			if(isDouble) {
+				dp.resetMinAndMax();
+				projImage = new ImagePlus(makeTitle(), dp);
+			} else {
+				fp.resetMinAndMax();
+				projImage = new ImagePlus(makeTitle(), fp);
+			}
 		} else {
 			rayFunc.postProcess();
-			projImage = makeOutputImage(imp, fp, ptype);
+			if(isDouble) {
+				dp.resetMinAndMax();
+				projImage = new ImagePlus(makeTitle(), dp);
+			} else {
+				projImage = makeOutputImage(imp, fp, ptype);
+			}
 		}
 		if(projImage == null)
 			IJ.error("Z Project", "Error computing projection.");
@@ -604,6 +627,24 @@ public class ZProjector implements PlugIn {
 		}
 	}
 
+	private RayFunction getRayFunction(int method, DoubleProcessor dp) {
+
+		switch(method) {
+			case AVG_METHOD:
+			case SUM_METHOD:
+				return new AverageIntensity(dp, sliceCount);
+			case MAX_METHOD:
+				return new MaxIntensity(dp);
+			case MIN_METHOD:
+				return new MinIntensity(dp);
+			case SD_METHOD:
+				return new StandardDeviation(dp, sliceCount);
+			default:
+				IJ.error("Z Project", "Unknown method.");
+				return null;
+		}
+	}
+
 	/** Generate output image whose type is same as input image. */
 	private ImagePlus makeOutputImage(ImagePlus imp, FloatProcessor fp, int ptype) {
 
@@ -611,7 +652,6 @@ public class ZProjector implements PlugIn {
 		int height = imp.getHeight();
 		float[] pixels = (float[])fp.getPixels();
 		ImageProcessor oip = null;
-		// Create output image consistent w/ type of input image.
 		int size = pixels.length;
 		switch(ptype) {
 			case BYTE_TYPE:
@@ -629,15 +669,15 @@ public class ZProjector implements PlugIn {
 			case FLOAT_TYPE:
 				oip = new FloatProcessor(width, height, pixels, null);
 				break;
+			case DOUBLE_TYPE: {
+				double[] pixels64 = new double[size];
+				for(int i = 0; i < size; i++)
+					pixels64[i] = pixels[i];
+				oip = new DoubleProcessor(width, height, pixels64);
+				break;
+			}
 		}
-		// Adjust for display.
-		// Calling this on non-ByteProcessors ensures image
-		// processor is set up to correctly display image.
 		oip.resetMinAndMax();
-		// Create new image plus object. Don't use
-		// ImagePlus.createImagePlus here because there may be
-		// attributes of input image that are not appropriate for
-		// projection.
 		return new ImagePlus(makeTitle(), oip);
 	}
 
@@ -658,6 +698,9 @@ public class ZProjector implements PlugIn {
 				break;
 			case FLOAT_TYPE:
 				rayFunc.projectSlice((float[])pixelArray);
+				break;
+			case DOUBLE_TYPE:
+				rayFunc.projectSlice((double[])pixelArray);
 				break;
 		}
 	}
@@ -689,16 +732,37 @@ public class ZProjector implements PlugIn {
 
 		IJ.showStatus("Calculating median...");
 		ImageStack stack = imp.getStack();
+		boolean isDouble = stack.getProcessor(1) instanceof DoubleProcessor;
 		ImageProcessor[] slices = new ImageProcessor[sliceCount];
 		int index = 0;
 		for(int slice = startSlice; slice <= stopSlice; slice += increment)
 			slices[index++] = stack.getProcessor(slice);
+		int width = imp.getWidth();
+		int height = imp.getHeight();
+		int inc = Math.max(height / 30, 1);
+		if(isDouble) {
+			// Full-precision median for 64-bit stacks.
+			DoubleProcessor ip2 = new DoubleProcessor(width, height);
+			double[] values = new double[sliceCount];
+			double[][] src = new double[sliceCount][];
+			for(int i = 0; i < sliceCount; i++)
+				src[i] = (double[])slices[i].getPixels();
+			for(int y = 0; y < height; y++) {
+				if(y % inc == 0)
+					IJ.showProgress(y, height - 1);
+				for(int x = 0; x < width; x++) {
+					int p = y * width + x;
+					for(int i = 0; i < sliceCount; i++)
+						values[i] = src[i][p];
+					ip2.putPixelValue(x, y, medianDouble(values));
+				}
+			}
+			IJ.showProgress(1, 1);
+			return new ImagePlus(makeTitle(), ip2);
+		}
 		ImageProcessor ip2 = slices[0].duplicate();
 		ip2 = ip2.convertToFloat();
 		float[] values = new float[sliceCount];
-		int width = ip2.getWidth();
-		int height = ip2.getHeight();
-		int inc = Math.max(height / 30, 1);
 		for(int y = 0; y < height; y++) {
 			if(y % inc == 0)
 				IJ.showProgress(y, height - 1);
@@ -712,6 +776,16 @@ public class ZProjector implements PlugIn {
 			ip2 = ip2.convertToByte(false);
 		IJ.showProgress(1, 1);
 		return new ImagePlus(makeTitle(), ip2);
+	}
+
+	double medianDouble(double[] a) {
+
+		Arrays.sort(a);
+		int middle = a.length / 2;
+		if((a.length & 1) == 0) // even
+			return (a[middle - 1] + a[middle]) / 2.0;
+		else
+			return a[middle];
 	}
 
 	float median(float[] a) {
@@ -761,26 +835,25 @@ public class ZProjector implements PlugIn {
 	 */
 	abstract class RayFunction {
 
-		/** Do actual slice projection for specific data types. */
 		public abstract void projectSlice(byte[] pixels);
 
 		public abstract void projectSlice(short[] pixels);
 
 		public abstract void projectSlice(float[] pixels);
 
-		/**
-		 * Perform any necessary post processing operations, e.g.
-		 * averging values.
-		 */
+		public abstract void projectSlice(double[] pixels);
+
 		public void postProcess() {
 
 		}
 	} // end RayFunction
 
 	/** Compute average intensity projection. */
+	/** Compute average intensity projection. */
 	class AverageIntensity extends RayFunction {
 
-		private float[] fpixels;
+		private float[] fpixels; // used for 8/16/32-bit input
+		private double[] dpixels; // used for 64-bit input
 		private int num, len;
 
 		/**
@@ -792,6 +865,14 @@ public class ZProjector implements PlugIn {
 
 			fpixels = (float[])fp.getPixels();
 			len = fpixels.length;
+			this.num = num;
+		}
+
+		/** Double-precision constructor for 64-bit input. */
+		public AverageIntensity(DoubleProcessor dp, int num) {
+
+			dpixels = (double[])dp.getPixels();
+			len = dpixels.length;
 			this.num = num;
 		}
 
@@ -813,18 +894,32 @@ public class ZProjector implements PlugIn {
 				fpixels[i] += pixels[i];
 		}
 
+		public void projectSlice(double[] pixels) {
+
+			for(int i = 0; i < len; i++)
+				dpixels[i] += pixels[i];
+		}
+
 		public void postProcess() {
 
-			float fnum = num;
-			for(int i = 0; i < len; i++)
-				fpixels[i] /= fnum;
+			if(dpixels != null) {
+				double dnum = num;
+				for(int i = 0; i < len; i++)
+					dpixels[i] /= dnum;
+			} else {
+				float fnum = num;
+				for(int i = 0; i < len; i++)
+					fpixels[i] /= fnum;
+			}
 		}
 	} // end AverageIntensity
 
 	/** Compute max intensity projection. */
+	/** Compute max intensity projection. */
 	class MaxIntensity extends RayFunction {
 
-		private float[] fpixels;
+		private float[] fpixels; // used for 8/16/32-bit input
+		private double[] dpixels; // used for 64-bit input
 		private int len;
 
 		/** Simple constructor since no preprocessing is necessary. */
@@ -834,6 +929,15 @@ public class ZProjector implements PlugIn {
 			len = fpixels.length;
 			for(int i = 0; i < len; i++)
 				fpixels[i] = -Float.MAX_VALUE;
+		}
+
+		/** Double-precision constructor for 64-bit input. */
+		public MaxIntensity(DoubleProcessor dp) {
+
+			dpixels = (double[])dp.getPixels();
+			len = dpixels.length;
+			for(int i = 0; i < len; i++)
+				dpixels[i] = -Double.MAX_VALUE;
 		}
 
 		public void projectSlice(byte[] pixels) {
@@ -859,12 +963,22 @@ public class ZProjector implements PlugIn {
 					fpixels[i] = pixels[i];
 			}
 		}
+
+		public void projectSlice(double[] pixels) {
+
+			for(int i = 0; i < len; i++) {
+				if(!Double.isNaN(pixels[i]) && pixels[i] > dpixels[i])
+					dpixels[i] = pixels[i];
+			}
+		}
 	} // end MaxIntensity
 
 	/** Compute min intensity projection. */
+	/** Compute min intensity projection. */
 	class MinIntensity extends RayFunction {
 
-		private float[] fpixels;
+		private float[] fpixels; // used for 8/16/32-bit input
+		private double[] dpixels; // used for 64-bit input
 		private int len;
 
 		/** Simple constructor since no preprocessing is necessary. */
@@ -874,6 +988,15 @@ public class ZProjector implements PlugIn {
 			len = fpixels.length;
 			for(int i = 0; i < len; i++)
 				fpixels[i] = Float.MAX_VALUE;
+		}
+
+		/** Double-precision constructor for 64-bit input. */
+		public MinIntensity(DoubleProcessor dp) {
+
+			dpixels = (double[])dp.getPixels();
+			len = dpixels.length;
+			for(int i = 0; i < len; i++)
+				dpixels[i] = Double.MAX_VALUE;
 		}
 
 		public void projectSlice(byte[] pixels) {
@@ -899,12 +1022,22 @@ public class ZProjector implements PlugIn {
 					fpixels[i] = pixels[i];
 			}
 		}
-	} // end MaxIntensity
 
+		public void projectSlice(double[] pixels) {
+
+			for(int i = 0; i < len; i++) {
+				if(!Double.isNaN(pixels[i]) && pixels[i] < dpixels[i])
+					dpixels[i] = pixels[i];
+			}
+		}
+	} // end MinIntensity
+
+	/** Compute standard deviation projection. */
 	/** Compute standard deviation projection. */
 	class StandardDeviation extends RayFunction {
 
-		private float[] result;
+		private float[] result; // used for 8/16/32-bit input
+		private double[] dresult; // used for 64-bit input
 		private double[] sum, sum2;
 		private int num, len;
 
@@ -912,6 +1045,16 @@ public class ZProjector implements PlugIn {
 
 			result = (float[])fp.getPixels();
 			len = result.length;
+			this.num = num;
+			sum = new double[len];
+			sum2 = new double[len];
+		}
+
+		/** Double-precision constructor for 64-bit input. */
+		public StandardDeviation(DoubleProcessor dp, int num) {
+
+			dresult = (double[])dp.getPixels();
+			len = dresult.length;
 			this.num = num;
 			sum = new double[len];
 			sum2 = new double[len];
@@ -947,19 +1090,34 @@ public class ZProjector implements PlugIn {
 			}
 		}
 
+		public void projectSlice(double[] pixels) {
+
+			double v;
+			for(int i = 0; i < len; i++) {
+				v = pixels[i];
+				sum[i] += v;
+				sum2[i] += v * v;
+			}
+		}
+
 		public void postProcess() {
 
 			double stdDev;
 			double n = num;
 			for(int i = 0; i < len; i++) {
+				double value;
 				if(num > 1) {
 					stdDev = (n * sum2[i] - sum[i] * sum[i]) / n;
 					if(stdDev > 0.0)
-						result[i] = (float)Math.sqrt(stdDev / (n - 1.0));
+						value = Math.sqrt(stdDev / (n - 1.0));
 					else
-						result[i] = 0f;
+						value = 0.0;
 				} else
-					result[i] = 0f;
+					value = 0.0;
+				if(dresult != null)
+					dresult[i] = value;
+				else
+					result[i] = (float)value;
 			}
 		}
 	} // end StandardDeviation

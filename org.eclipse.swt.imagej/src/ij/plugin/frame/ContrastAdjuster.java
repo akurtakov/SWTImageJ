@@ -270,7 +270,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 		if(imp != null && imp.isComposite()) {
 			for(int i = 0; i < altChannelLabels.length; i++)
 				choice.add(altChannelLabels[i]);
-		} else if(imp != null && ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32))) {
+		} else if(imp != null && ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32) || (imp.getType() == ImagePlus.GRAY64))) {
 			for(int i = 0; i < greyChannelLabels.length; i++)
 				choice.add(greyChannelLabels[i]);
 		} else {
@@ -389,7 +389,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			max2 = 255.0;
 		}
 		int bitDepth = imp.getBitDepth();
-		if(bitDepth == 16 || bitDepth == 32) {
+		if(bitDepth == 16 || bitDepth == 32 || bitDepth == 64) {
 			Roi roi = imp.getRoi();
 			imp.deleteRoi();
 			ImageStatistics stats = imp.getRawStatistics();
@@ -437,7 +437,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 						choice.removeAll();
 						addBalanceChoices();
 					}
-				} else if((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32)) { // grey image
+				} else if((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32) || (imp.getType() == ImagePlus.GRAY64)) { // grey image
 					if(!choice.getItem(0).equals("LUT level")) { // if the choice is wrong
 						choice.removeAll();
 						addBalanceChoices();
@@ -483,7 +483,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			;
 			int type = imp.getType();
 			Calibration cal = imp.getCalibration();
-			boolean realValue = type == ImagePlus.GRAY32;
+			boolean realValue = type == ImagePlus.GRAY32 || type == ImagePlus.GRAY64;
 			if(cal.calibrated()) {
 				min = cal.getCValue((int)min);
 				max = cal.getCValue((int)max);
@@ -670,7 +670,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 		if(RGBImage)
 			ip.reset();
 		int bitDepth = imp.getBitDepth();
-		if(bitDepth == 16 || bitDepth == 32) {
+		if(bitDepth == 16 || bitDepth == 32 || bitDepth == 64) {
 			imp.resetDisplayRange();
 			defaultMin = imp.getDisplayRangeMin();
 			defaultMax = imp.getDisplayRangeMax();
@@ -709,7 +709,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			if(balance) {
 				setTitle("Color");
 			}
-			if(balance && ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32)) && !imp.isComposite()) { // image is grey
+			if(balance && ((imp.getType() == ImagePlus.GRAY8) || (imp.getType() == ImagePlus.GRAY16) || (imp.getType() == ImagePlus.GRAY32) || (imp.getType() == ImagePlus.GRAY64)) && !imp.isComposite()) { // image is grey
 				setTitle("LUT Color");
 			}
 			int range = imp.getType() == ImagePlus.GRAY16 ? ImagePlus.getDefault16bitRange() : 0;
@@ -748,9 +748,9 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 				applyRGB(imp, ip);
 			return;
 		}
-		if(bitDepth == 32) {
+		if(bitDepth == 32 || bitDepth == 64) {
 			IJ.beep();
-			IJ.error("\"Apply\" does not work with 32-bit images");
+			IJ.error("\"Apply\" does not work with 32-bit or 64-bit images");
 			imp.unlock();
 			return;
 		}
@@ -1019,7 +1019,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 				if(propagate)
 					propagate(imp);
 				if(IJ.recording()) {
-					if(imp.getBitDepth() == 32)
+					if(imp.getBitDepth() == 32 || imp.getBitDepth() == 64)
 						recordSetMinAndMax(min, max);
 					else {
 						int imin = (int)min;
@@ -1170,7 +1170,7 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			if(propagate)
 				propagate(imp);
 			if(IJ.recording()) {
-				if(imp.getBitDepth() == 32)
+				if(imp.getBitDepth() == 32 || imp.getBitDepth() == 64)
 					recordSetMinAndMax(min, max);
 				else {
 					int imin = (int)min;
@@ -1195,11 +1195,15 @@ public class ContrastAdjuster extends PlugInDialog implements Runnable, Selectio
 			} else
 				Recorder.record("setMinAndMax", imin, imax);
 		} else {
+			// Use 16-digit precision so 64-bit display ranges round-trip losslessly
+			// through the recorded macro. d2s with `-16` returns the value in
+			// scientific notation when needed and keeps 16 significant digits.
+			int digits = -16;
 			if(Recorder.scriptMode()) {
-				Recorder.recordCall("imp.setDisplayRange(" + ResultsTable.d2s(min, 2) + ", " + ResultsTable.d2s(max, 2) + ");");
+				Recorder.recordCall("imp.setDisplayRange(" + IJ.d2s(min, digits) + ", " + IJ.d2s(max, digits) + ");");
 				Recorder.recordCall("imp.updateAndDraw();");
 			} else
-				Recorder.recordString("setMinAndMax(" + ResultsTable.d2s(min, 2) + ", " + ResultsTable.d2s(max, 2) + ");");
+				Recorder.recordString("setMinAndMax(" + IJ.d2s(min, digits) + ", " + IJ.d2s(max, digits) + ");");
 		}
 	}
 
@@ -1481,10 +1485,9 @@ class ContrastPlot extends org.eclipse.swt.widgets.Canvas implements org.eclipse
 			hColors[i] = new Color(110, 110, 150);
 		}
 		int impType = imp.getType();
-		if((impType == ImagePlus.GRAY8) || (impType == ImagePlus.GRAY16) || (impType == ImagePlus.GRAY32)) { // if
-																												// image
-																												// has
-																												// LUT
+		if((impType == ImagePlus.GRAY8) || (impType == ImagePlus.GRAY16) || (impType == ImagePlus.GRAY32) || (impType == ImagePlus.GRAY64)) { // image
+			// has
+			// LUT
 			ImageProcessor ip = imp.getProcessor();
 			ColorModel cm = ip.getColorModel();
 			IndexColorModel icm = (IndexColorModel)cm;

@@ -24,7 +24,7 @@ import ij.process.ImageProcessor;
 public class ImageMath implements ExtendedPlugInFilter, DialogListener {
 
 	public static final String MACRO_KEY = "math.macro";
-	private int flags = DOES_ALL | SUPPORTS_MASKING | KEEP_PREVIEW | PARALLELIZE_STACKS;
+	private int flags = DOES_ALL | DOES_64 | SUPPORTS_MASKING | KEEP_PREVIEW | PARALLELIZE_STACKS;
 	private String arg;
 	private ImagePlus imp;
 	private boolean canceled;
@@ -142,7 +142,7 @@ public class ImageMath implements ExtendedPlugInFilter, DialogListener {
 		} else if(arg.equals("nan")) {
 			setBackgroundToNaN(ip);
 		} else if(arg.equals("abs")) {
-			if((ip instanceof FloatProcessor) || imp.getCalibration().isSigned16Bit()) {
+			if((ip instanceof FloatProcessor) || (ip instanceof ij.process.DoubleProcessor) || imp.getCalibration().isSigned16Bit()) {
 				ip.abs();
 				ip.resetMinAndMax();
 			} else
@@ -198,15 +198,30 @@ public class ImageMath implements ExtendedPlugInFilter, DialogListener {
 		if(lower == -1.0 && upper == -1.0) {
 			lower = ip.getMinThreshold();
 			upper = ip.getMaxThreshold();
-			if(lower == ImageProcessor.NO_THRESHOLD || !(ip instanceof FloatProcessor)) {
+			if(lower == ImageProcessor.NO_THRESHOLD || !(ip instanceof FloatProcessor || ip instanceof ij.process.DoubleProcessor)) {
 				String title = imp != null ? "\n\"" + imp.getTitle() + "\"" : "";
-				IJ.error("NaN Backround", "Thresholded 32-bit float image required:" + title);
+				IJ.error("NaN Background", "Thresholded 32-bit float or 64-bit double image required:" + title);
 				canceled = true;
 				return;
 			}
 		}
-		if(!(ip instanceof FloatProcessor))
+		if(!(ip instanceof FloatProcessor || ip instanceof ij.process.DoubleProcessor))
 			return;
+		if(ip instanceof ij.process.DoubleProcessor) {
+			double[] pixels = (double[])ip.getPixels();
+			int width = ip.getWidth();
+			int height = ip.getHeight();
+			double v;
+			for(int y = 0; y < height; y++) {
+				for(int x = 0; x < width; x++) {
+					v = pixels[y * width + x];
+					if(v < lower || v > upper)
+						pixels[y * width + x] = Double.NaN;
+				}
+			}
+			ip.resetMinAndMax();
+			return;
+		}
 		float[] pixels = (float[])ip.getPixels();
 		int width = ip.getWidth();
 		int height = ip.getHeight();
@@ -412,6 +427,31 @@ public class ImageMath implements ExtendedPlugInFilter, DialogListener {
 					if(v2 > 65535)
 						v2 = 65535;
 					pixels2[index] = (short)v2;
+				}
+			}
+			if(hasGetPixel)
+				System.arraycopy(pixels2, 0, pixels1, 0, w * h);
+		} else if(bitDepth == 64) {
+			double[] pixels1 = (double[])ip.getPixels();
+			double[] pixels2 = pixels1;
+			if(hasGetPixel)
+				pixels2 = new double[w * h];
+			for(int y = r.y; y < (r.y + r.height); y++) {
+				if(showProgress && y % inc == 0)
+					IJ.showProgress(y - r.y, r.height);
+				interp.setVariable("y", y);
+				for(int x = r.x; x < (r.x + r.width); x++) {
+					index = y * w + x;
+					v = pixels1[index];
+					interp.setVariable("v", v);
+					if(hasX)
+						interp.setVariable("x", x);
+					if(hasA)
+						interp.setVariable("a", getA((h - y - 1) - h2, x - w2));
+					if(hasD)
+						interp.setVariable("d", getD(x - w2, y - h2));
+					interp.run(PCStart);
+					pixels2[index] = interp.getVariable("v");
 				}
 			}
 			if(hasGetPixel)

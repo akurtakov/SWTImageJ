@@ -5,6 +5,7 @@ import java.awt.image.ColorModel;
 
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
+import ij.process.DoubleProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.IntProcessor;
@@ -102,6 +103,8 @@ public class ImageStack {
 			this.bitDepth = 32;
 		else if(pixels instanceof int[])
 			this.bitDepth = 24;
+		else if(pixels instanceof double[])
+			this.bitDepth = 64;
 	}
 
 	/**
@@ -170,9 +173,28 @@ public class ImageStack {
 				case 32:
 					ip = ip.convertToFloat();
 					break;
+				case 64:
+					// DoubleProcessor only supports lossless promotion;
+					// build a DoubleProcessor from the source pixels.
+					if(!(ip instanceof DoubleProcessor)) {
+						ip = convertProcessorToDouble(ip);
+					}
+					break;
 			}
 		}
 		return ip;
+	}
+
+	/** Helper: lossless promotion of any ImageProcessor to a DoubleProcessor. */
+	private DoubleProcessor convertProcessorToDouble(ImageProcessor src) {
+
+		int w = src.getWidth();
+		int h = src.getHeight();
+		double[] out = new double[w * h];
+		for(int y = 0, i = 0; y < h; y++)
+			for(int x = 0; x < w; x++, i++)
+				out[i] = src.getPixelValue(x, y);
+		return new DoubleProcessor(w, h, out);
 	}
 
 	/**
@@ -390,9 +412,12 @@ public class ImageStack {
 				ip = new ColorProcessor(width, height, null);
 		} else if(stack[n - 1] instanceof float[])
 			ip = new FloatProcessor(width, height, null, cm);
+		else if(stack[n - 1] instanceof double[])
+			ip = new DoubleProcessor(width, height, (double[])stack[n - 1]);
 		else
 			throw new IllegalArgumentException("Unknown stack type");
-		ip.setPixels(stack[n - 1]);
+		if(!(stack[n - 1] instanceof double[])) // DoubleProcessor already set
+			ip.setPixels(stack[n - 1]);
 		if(min != Double.MAX_VALUE && ip != null && !(ip instanceof ColorProcessor))
 			ip.setMinAndMax(min, max);
 		if(cTable != null)
@@ -498,6 +523,9 @@ public class ImageStack {
 				case 32:
 					float[] floats = (float[])stack[z];
 					return floats[y * width + x];
+				case 64:
+					double[] doubles = (double[])stack[z];
+					return doubles[y * width + x];
 				case 24:
 					int[] ints = (int[])stack[z];
 					return ints[y * width + x] & 0xffffffff;
@@ -533,6 +561,10 @@ public class ImageStack {
 					float[] floats = (float[])stack[z];
 					floats[y * width + x] = (float)value;
 					break;
+				case 64:
+					double[] doubles = (double[])stack[z];
+					doubles[y * width + x] = value;
+					break;
 				case 24:
 					int[] ints = (int[])stack[z];
 					ints[y * width + x] = (int)value;
@@ -566,6 +598,11 @@ public class ImageStack {
 							float[] floats = (float[])stack[z];
 							for(int x = x0; x < x0 + w; x++)
 								voxels[i++] = floats[y * width + x];
+							break;
+						case 64:
+							double[] doubles = (double[])stack[z];
+							for(int x = x0; x < x0 + w; x++)
+								voxels[i++] = (float)doubles[y * width + x];
 							break;
 						case 24:
 							int[] ints = (int[])stack[z];
@@ -658,6 +695,13 @@ public class ImageStack {
 								floats[y * width + x] = value;
 							}
 							break;
+						case 64:
+							double[] doubles = (double[])stack[z];
+							for(int x = x0; x < x0 + w; x++) {
+								value = voxels[i++];
+								doubles[y * width + x] = value;
+							}
+							break;
 						case 24:
 							int[] ints = (int[])stack[z];
 							for(int x = x0; x < x0 + w; x++) {
@@ -745,10 +789,10 @@ public class ImageStack {
 		return this.bitDepth;
 	}
 
-	/** Sets the bit depth (8=byte, 16=short, 24=RGB, 32=float). */
+	/** Sets the bit depth (8=byte, 16=short, 24=RGB, 32=float, 64=double). */
 	public void setBitDepth(int depth) {
 
-		if(size() == 0 && (depth == 8 || depth == 16 || depth == 24 || depth == 32))
+		if(size() == 0 && (depth == 8 || depth == 16 || depth == 24 || depth == 32 || depth == 64))
 			this.bitDepth = depth;
 	}
 
@@ -762,12 +806,12 @@ public class ImageStack {
 	 * @param depth
 	 *            number of images
 	 * @param bitdepth
-	 *            8, 16, 32 (float) or 24 (RGB)
+	 *            8, 16, 32, 64 (float) or 24 (RGB)
 	 */
 	public static ImageStack create(int width, int height, int depth, int bitdepth) {
 
 		ImageStack stack = IJ.createImage("", width, height, depth, bitdepth).getStack();
-		if(bitdepth == 16 || bitdepth == 32) {
+		if(bitdepth == 16 || bitdepth == 32 || bitdepth == 64) {
 			stack.min = Double.MAX_VALUE;
 			stack.max = 0.0;
 		}
@@ -791,7 +835,7 @@ public class ImageStack {
 			stack.addSlice(images[i].getProcessor());
 		}
 		int depth = images[0].getBitDepth();
-		if(depth == 16 || depth == 32) {
+		if(depth == 16 || depth == 32 || depth == 64) {
 			stack.min = Double.MAX_VALUE;
 			stack.max = 0.0;
 		}
